@@ -1,4 +1,4 @@
-package com.example.vbook.data
+package com.example.vbook.data.parsers
 
 import com.example.vbook.data.model.Book
 
