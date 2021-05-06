@@ -3,7 +3,7 @@ package com.example.vbook.data.parsers
 import com.example.vbook.data.model.Book
 
 abstract class BooksParser {
-    abstract var base_url: String
+    abstract val base_url: String
 
     abstract fun getBooks(page:Int):List<Book>
 

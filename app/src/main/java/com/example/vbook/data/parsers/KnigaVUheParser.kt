@@ -6,10 +6,8 @@ import org.jsoup.Jsoup
 import javax.inject.Inject
 
 
-class KnigaVUheParser @Inject constructor(override var base_url: String) : BooksParser() {
-    companion object{
-        var BASE_URL="https://knigavuhe.org/"
-    }
+class KnigaVUheParser @Inject constructor() : BooksParser() {
+    override val base_url: String="https://knigavuhe.org/"
 
     override fun getBooks(page: Int): MutableList<Book> {
         val url=base_url+"new/?page=$page"
@@ -23,23 +21,22 @@ class KnigaVUheParser @Inject constructor(override var base_url: String) : Books
             val coverURL=element.select(".bookkitem_cover_img").attr("src")
             val title=element.select("a.bookkitem_name").text()
             val author=element.select(".bookkitem_author").select("a").text()
-            val authorURL=element.select(".bookkitem_author").select("a")
-                .attr("href")
-            val reader=element.select(".bookkitem_meta_block")[0]
-                .select("span")[1].text()
-            val readerURL=element.select(".bookkitem_meta_block")[0]
-                .select("a").attr("href")
+            val authorURL=element.select(".bookkitem_author").select("a").attr("href")
             val bookURL=element.select("a.bookkitem_name").attr("href")
-//            duration
-//            cycle
+            val bookkitem_meta=element.select(".bookkitem_meta")
+            val reader=bookkitem_meta.select(".-reader").next().next().select("a").text()
+            val readerURL=bookkitem_meta.select(".-reader").next().next().select("a").attr("href")
+            val cycle=bookkitem_meta.select(".-serie").next().select("a").text()
+            val cycleURL=bookkitem_meta.select(".-serie").next().select("a").attr("href")
 
             val book= Book(
                 title = title,
                 coverURL = coverURL,
                 author = author to authorURL,
                 bookURL = bookURL,
-                reader = reader to readerURL)
-
+                reader = reader to readerURL,
+                cycle = cycle to cycleURL
+            )
             list.add(book)
         }
 

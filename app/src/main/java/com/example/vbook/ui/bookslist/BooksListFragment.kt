@@ -1,19 +1,19 @@
 package com.example.vbook.ui.bookslist
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.vbook.data.parsers.KnigaVUheParser
+import com.example.vbook.data.repository.BookRepository
 import com.example.vbook.databinding.FragmentBookListBinding
-import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class BooksListFragment : Fragment() {
@@ -22,18 +22,24 @@ class BooksListFragment : Fragment() {
         ViewModelProvider(this).get(BooksListVM::class.java)
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding=FragmentBookListBinding.inflate(inflater,container,false)
-        GlobalScope.launch(Dispatchers.IO) {
-            var book=KnigaVUheParser(KnigaVUheParser.BASE_URL).getBooks(1).get(0)
-            withContext(Dispatchers.Main){
-                Picasso.with(context).load(book.coverURL).into(binding.imageView)
-                binding.textView.text=book.title
+
+        lifecycleScope.launch {
+            vm.allBooks.collect {
+                Log.e("AAA",it.toString())
+                binding.textView.text=it.toString()
             }
         }
+
+            binding.button.setOnClickListener {
+                lifecycleScope.launch {vm.loadMoreBooks()}
+            }
+
 
 
         return binding.root

@@ -9,7 +9,8 @@ data class Book(
     var reader:Pair<String,String>,
     var coverURL:String,
     var mp3List: List<Pair<String,String>>?=null,
-    var cycle: List<Book>?=null,
+    val cycle:Pair<String,String>,
+    var cycleBookList: List<Book>?=null,
     var duration: String?=null,
 )
 //Pair( title url)
