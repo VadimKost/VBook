@@ -9,8 +9,27 @@ import javax.inject.Inject
 class KnigaVUheParser @Inject constructor() : BooksParser() {
     override val base_url: String="https://knigavuhe.org/"
 
-    override fun getBooks(page: Int): MutableList<Book> {
-        val url=base_url+"new/?page=$page"
+    override fun getAllBookList(page: Int): MutableList<Book> {
+        return parseBookList("new/?page=$page")
+    }
+
+    override fun getBookDetailed(book: Book): Book {
+        val url=base_url+book.bookURL
+        val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
+            .referrer("http://www.google.com").get()
+        val script =doc.getElementsByTag("script").first()
+        val list = Regex("[\\[].+[\\]]").find(script.text())?.value
+        Log.e("VVV",list.toString())
+        return book
+    }
+
+
+    override fun search(text: String, page: Int): List<Book> {
+        TODO("Not yet implemented")
+    }
+
+    override fun parseBookList(URL: String): MutableList<Book> {
+        val url=base_url+URL
         val list:MutableList<Book> = mutableListOf()
 
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
@@ -39,12 +58,6 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
             )
             list.add(book)
         }
-
-
         return list
-    }
-
-    override fun search(text: String, page: Int): List<Book> {
-        TODO("Not yet implemented")
     }
 }

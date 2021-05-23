@@ -7,20 +7,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class BookRepository @Inject constructor(
     knigaVUheParser: KnigaVUheParser
 ){
     val parsers = listOf<BooksParser>(knigaVUheParser)
 
-    val allBooks = MutableStateFlow<Set<Book>>(setOf())
-    val searchedBooks = MutableStateFlow<Set<Book>>(setOf())
 
-//  adds books from site page to flow
-    suspend fun addBooks(page:Int) {
-        withContext(Dispatchers.IO){
-            allBooks.value= allBooks.value.plus(parsers.first().getBooks(page))
+    suspend fun addBooks(page:Int):List<Book> {
+        return withContext(Dispatchers.IO) {
+            parsers.first().getAllBookList(page)
         }
     }
 }

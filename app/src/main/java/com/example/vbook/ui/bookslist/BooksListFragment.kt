@@ -1,15 +1,15 @@
 package com.example.vbook.ui.bookslist
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.vbook.data.parsers.KnigaVUheParser
-import com.example.vbook.data.repository.BookRepository
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.vbook.adapter.BookSetAdapterRV
+import com.example.vbook.data.model.Book
 import com.example.vbook.databinding.FragmentBookListBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -29,18 +29,22 @@ class BooksListFragment : Fragment() {
     ): View {
         binding=FragmentBookListBinding.inflate(inflater,container,false)
 
+        var data= mutableSetOf<Book>()
+        val adapterRV =BookSetAdapterRV(data)
+        binding.rv.adapter=adapterRV
+        binding.rv.layoutManager=LinearLayoutManager(context)
+
         lifecycleScope.launch {
-            vm.allBooks.collect {
-                Log.e("AAA",it.toString())
-                binding.textView.text=it.toString()
+            vm.allNewBooks.collect{
+                data.addAll(it)
+                adapterRV.notifyDataSetChanged()
             }
         }
-
-            binding.button.setOnClickListener {
-                lifecycleScope.launch {vm.loadMoreBooks()}
+        binding.fab.setOnClickListener {
+            lifecycleScope.launch {
+                vm.loadMoreNewBooks()
             }
-
-
+        }
 
         return binding.root
     }
