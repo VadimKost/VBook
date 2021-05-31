@@ -11,14 +11,25 @@ import javax.inject.Singleton
 
 @Singleton
 class BookRepository @Inject constructor(
-    knigaVUheParser: KnigaVUheParser
+    val knigaVUheParser: KnigaVUheParser
 ){
     val parsers = listOf<BooksParser>(knigaVUheParser)
 
 
-    suspend fun addBooks(page:Int):List<Book> {
+    suspend fun addBooks(page:Int):MutableSet<Book> {
         return withContext(Dispatchers.IO) {
-            parsers.first().getAllBookList(page)
+            parsers.first().getAllBookList(page).toMutableSet()
         }
+    }
+
+    suspend fun getBookDetailed(book: Book): Book {
+        var bookDetailed=book
+        withContext(Dispatchers.IO){
+            bookDetailed=when(book.source){
+                KnigaVUheParser.TAG-> knigaVUheParser.getBookDetailed(book)
+                else -> book
+            }
+        }
+        return bookDetailed
     }
 }

@@ -4,10 +4,17 @@ import android.util.Log
 import com.example.vbook.data.model.Book
 import org.jsoup.Jsoup
 import javax.inject.Inject
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 
 
 class KnigaVUheParser @Inject constructor() : BooksParser() {
+    companion object{
+        val TAG: String="KnigaVUheParser"
+    }
     override val base_url: String="https://knigavuhe.org/"
+
 
     override fun getAllBookList(page: Int): MutableList<Book> {
         return parseBookList("new/?page=$page")
@@ -15,11 +22,21 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
 
     override fun getBookDetailed(book: Book): Book {
         val url=base_url+book.bookURL
+        var mp3List=""
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
             .referrer("http://www.google.com").get()
-        val script =doc.getElementsByTag("script").first()
-        val list = Regex("[\\[].+[\\]]").find(script.text())?.value
-        Log.e("VVV",list.toString())
+        val scripts =doc.getElementsByTag("script")
+        for(i in scripts){
+            val list = Regex("[\\[{].+[\\}]]").find(i.toString())?.value
+            if (list != null){
+                mp3List =list
+            }
+        }
+        val gson = GsonBuilder()
+            .setLenient()
+            .create();
+        val itemsListType = object : TypeToken<List<BookDetailedFragments>>() {}.type
+        val list=gson.fromJson<BookDetailedFragments>(mp3List,itemsListType)
         return book
     }
 
@@ -49,6 +66,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
             val cycleURL=bookkitem_meta.select(".-serie").next().select("a").attr("href")
 
             val book= Book(
+                source= TAG,
                 title = title,
                 coverURL = coverURL,
                 author = author to authorURL,
@@ -60,4 +78,13 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         }
         return list
     }
+
+    data class  BookDetailedFragments(
+        val id : Int,
+        val title : String,
+        val url : String,
+        val error : Int,
+        val duration : Int,
+        val duration_float : Double
+    )
 }

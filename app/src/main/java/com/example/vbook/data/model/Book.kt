@@ -3,6 +3,7 @@ package com.example.vbook.data.model
 
 
 data class Book(
+    var source:String,
     var bookURL:String,
     var title:String,
     var author:Pair<String,String>,

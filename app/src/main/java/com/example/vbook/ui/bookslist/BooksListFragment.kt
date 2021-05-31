@@ -29,15 +29,15 @@ class BooksListFragment : Fragment() {
     ): View {
         binding=FragmentBookListBinding.inflate(inflater,container,false)
 
-        var data= mutableSetOf<Book>()
-        val adapterRV =BookSetAdapterRV(data)
+        val adapterRV =BookSetAdapterRV(vm.bookData)
         binding.rv.adapter=adapterRV
         binding.rv.layoutManager=LinearLayoutManager(context)
 
         lifecycleScope.launch {
-            vm.allNewBooks.collect{
-                data.addAll(it)
-                adapterRV.notifyDataSetChanged()
+            vm.actions.collect{
+                when(it){
+                    is BooksListVM.Action.updateRV ->adapterRV.notifyDataSetChanged()
+                }
             }
         }
         binding.fab.setOnClickListener {

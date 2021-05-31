@@ -5,6 +5,7 @@ import com.example.vbook.data.model.Book
 import com.example.vbook.data.repository.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -13,7 +14,9 @@ class BooksListVM @Inject constructor(
     val booksRepository: BookRepository
 ):ViewModel() {
     var page=1
-    val allNewBooks = MutableStateFlow(setOf<Book>())
+    var bookData= mutableSetOf<Book>()
+    private val _actions= MutableStateFlow(Action.updateRV())
+    val  actions:StateFlow<Action> =_actions
     init {
         runBlocking {
             loadMoreNewBooks()
@@ -21,8 +24,12 @@ class BooksListVM @Inject constructor(
     }
 
     suspend fun loadMoreNewBooks(){
-        allNewBooks.value =allNewBooks.value.plus(booksRepository.addBooks(page))
+        bookData.addAll(booksRepository.addBooks(page))
+        _actions.value=Action.updateRV()
         ++page
     }
 
+     sealed class Action{
+         class updateRV:Action()
+     }
 }
