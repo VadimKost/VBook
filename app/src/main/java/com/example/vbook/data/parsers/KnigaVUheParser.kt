@@ -1,10 +1,8 @@
 package com.example.vbook.data.parsers
 
-import android.util.Log
 import com.example.vbook.data.model.Book
 import org.jsoup.Jsoup
 import javax.inject.Inject
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 
@@ -13,8 +11,8 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
     companion object{
         val TAG: String="KnigaVUheParser"
     }
-    override val base_url: String="https://knigavuhe.org/"
 
+    override val base_url: String="https://knigavuhe.org/"
 
     override fun getAllBookList(page: Int): MutableList<Book> {
         return parseBookList("new/?page=$page")
@@ -32,14 +30,15 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
                 mp3List =list
             }
         }
+        mp3List=mp3List.split("]")[0]+"]"
+        print(mp3List)
         val gson = GsonBuilder()
-            .setLenient()
             .create();
-        val itemsListType = object : TypeToken<List<BookDetailedFragments>>() {}.type
-        val list=gson.fromJson<BookDetailedFragments>(mp3List,itemsListType)
+        val itemsListType = object : TypeToken<List<BookMedia>>() {}.type
+        val list=gson.fromJson<List<BookMedia>>(mp3List,itemsListType)
+        print(list.toString())
         return book
     }
-
 
     override fun search(text: String, page: Int): List<Book> {
         TODO("Not yet implemented")
@@ -79,12 +78,16 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         return list
     }
 
-    data class  BookDetailedFragments(
+    data class  BookMedia(
         val id : Int,
         val title : String,
         val url : String,
         val error : Int,
         val duration : Int,
         val duration_float : Double
-    )
+    ){
+        fun fillBookWithMedia(book: Book,bookMedia: BookMedia): Book {
+            return book
+        }
+    }
 }

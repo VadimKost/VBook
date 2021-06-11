@@ -9,5 +9,23 @@
         android:id="@+id/bookList"
         android:name="com.example.vbook.ui.bookslist.BooksListFragment"
         android:label="fragment_book_list"
-        tools:layout="@layout/fragment_book_list" />
+        tools:layout="@layout/fragment_book_list" >
+        <action
+            android:id="@+id/action_bookList_to_bookDetailedFragment"
+            app:destination="@id/bookDetailedFragment">
+            <argument
+                android:name="myArg"
+                app:argType="integer"
+                android:defaultValue="1" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/bookDetailedFragment"
+        android:name="com.example.vbook.ui.bookdetailed.BookDetailedFragment"
+        android:label="fragment_book_detailed"
+        tools:layout="@layout/fragment_book_detailed" >
+        <argument
+            android:name="bookIndex"
+            app:argType="integer" />
+    </fragment>
 </navigation>

@@ -14,9 +14,11 @@ class BooksListVM @Inject constructor(
     val booksRepository: BookRepository
 ):ViewModel() {
     var page=1
-    var bookData= mutableSetOf<Book>()
+    var newBooks= booksRepository.newBookData
+
     private val _actions= MutableStateFlow(Action.updateRV())
     val  actions:StateFlow<Action> =_actions
+
     init {
         runBlocking {
             loadMoreNewBooks()
@@ -24,9 +26,8 @@ class BooksListVM @Inject constructor(
     }
 
     suspend fun loadMoreNewBooks(){
-        bookData.addAll(booksRepository.addBooks(page))
+        booksRepository.receiveNewBook(page++)
         _actions.value=Action.updateRV()
-        ++page
     }
 
      sealed class Action{

@@ -15,15 +15,21 @@ class BookRepository @Inject constructor(
 ){
     val parsers = listOf<BooksParser>(knigaVUheParser)
 
+    val newBookData= mutableListOf<Book>()
 
-    suspend fun addBooks(page:Int):MutableSet<Book> {
+    suspend fun receiveNewBook(page:Int){
         return withContext(Dispatchers.IO) {
-            parsers.first().getAllBookList(page).toMutableSet()
+            val books=parsers.first().getAllBookList(page).toMutableSet()
+            newBookData.apply {
+                addAll(books)
+                distinct()
+            }
         }
     }
 
     suspend fun getBookDetailed(book: Book): Book {
-        var bookDetailed=book
+        val bookDetailed:Book
+
         withContext(Dispatchers.IO){
             bookDetailed=when(book.source){
                 KnigaVUheParser.TAG-> knigaVUheParser.getBookDetailed(book)
@@ -32,4 +38,5 @@ class BookRepository @Inject constructor(
         }
         return bookDetailed
     }
+
 }

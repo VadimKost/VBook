@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.vbook.adapter.BookSetAdapterRV
 import com.example.vbook.data.model.Book
@@ -29,7 +30,11 @@ class BooksListFragment : Fragment() {
     ): View {
         binding=FragmentBookListBinding.inflate(inflater,container,false)
 
-        val adapterRV =BookSetAdapterRV(vm.bookData)
+        val adapterRV =BookSetAdapterRV(vm.newBooks){
+            val action = BooksListFragmentDirections
+                .actionBookListToBookDetailedFragment(bookIndex = it)
+            findNavController().navigate(action)
+        }
         binding.rv.adapter=adapterRV
         binding.rv.layoutManager=LinearLayoutManager(context)
 
