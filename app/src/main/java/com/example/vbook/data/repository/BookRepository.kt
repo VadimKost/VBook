@@ -17,7 +17,7 @@ class BookRepository @Inject constructor(
 
     val newBookData= mutableListOf<Book>()
 
-    suspend fun receiveNewBook(page:Int){
+    suspend fun getBooks(page:Int){
         return withContext(Dispatchers.IO) {
             val books=parsers.first().getAllBookList(page).toMutableSet()
             newBookData.apply {

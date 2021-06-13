@@ -1,5 +1,6 @@
 package com.example.vbook.data.parsers
 
+import android.util.Log
 import com.example.vbook.data.model.Book
 import org.jsoup.Jsoup
 import javax.inject.Inject
@@ -20,23 +21,28 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
 
     override fun getBookDetailed(book: Book): Book {
         val url=base_url+book.bookURL
-        var mp3List=""
+        var jsonMp3=""
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
             .referrer("http://www.google.com").get()
         val scripts =doc.getElementsByTag("script")
         for(i in scripts){
-            val list = Regex("[\\[{].+[\\}]]").find(i.toString())?.value
+            val list = Regex("[\\[{].+[\\}]]").find(i.toString())?.next()?.value
             if (list != null){
-                mp3List =list
+                jsonMp3 =list
+                Log.e("VVV",jsonMp3)
             }
         }
-        mp3List=mp3List.split("]")[0]+"]"
-        print(mp3List)
+        jsonMp3=jsonMp3.split("]")[0]+"]"
         val gson = GsonBuilder()
             .create();
         val itemsListType = object : TypeToken<List<BookMedia>>() {}.type
-        val list=gson.fromJson<List<BookMedia>>(mp3List,itemsListType)
-        print(list.toString())
+        val list=gson.fromJson<List<BookMedia>>(jsonMp3,itemsListType)
+        val mp3List= mutableListOf<Pair<String,String>>()
+        Log.e("VVV",list.toString())
+        for(i in list){
+            mp3List.add(i.title to i.url)
+        }
+        book.mp3List=mp3List
         return book
     }
 
