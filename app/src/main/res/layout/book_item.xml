@@ -38,7 +38,7 @@
     <data>
         <variable
             name="book"
-            type="com.example.vbook.data.model.Book" />
+            type="com.example.vbook.domain.model.Book" />
     </data>
 
 </layout>

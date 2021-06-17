@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/bookList"
-        android:name="com.example.vbook.ui.bookslist.BooksListFragment"
+        android:name="com.example.vbook.presentation.bookslist.BooksListFragment"
         android:label="fragment_book_list"
         tools:layout="@layout/fragment_book_list" >
         <action
@@ -21,7 +21,7 @@
     </fragment>
     <fragment
         android:id="@+id/bookDetailedFragment"
-        android:name="com.example.vbook.ui.bookdetailed.BookDetailedFragment"
+        android:name="com.example.vbook.presentation.bookdetailed.BookDetailedFragment"
         android:label="fragment_book_detailed"
         tools:layout="@layout/fragment_book_detailed" >
         <argument

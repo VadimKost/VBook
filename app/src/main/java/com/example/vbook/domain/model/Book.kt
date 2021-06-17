@@ -1,4 +1,4 @@
-package com.example.vbook.data.model
+package com.example.vbook.domain.model
 
 
 

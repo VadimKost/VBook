@@ -1,4 +1,4 @@
-package com.example.vbook.ui
+package com.example.vbook.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,7 +6,6 @@ import androidx.databinding.DataBindingUtil
 import com.example.vbook.R
 import com.example.vbook.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import org.jsoup.Jsoup
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {

@@ -1,6 +1,5 @@
-package com.example.vbook.adapter
+package com.example.vbook.presentation.adapter
 
-import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.squareup.picasso.Picasso

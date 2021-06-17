@@ -6,7 +6,7 @@
         android:id="@+id/constraint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.bookdetailed.BookDetailedFragment" >
+        tools:context=".presentation.bookdetailed.BookDetailedFragment" >
 
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/video_view"

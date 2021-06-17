@@ -1,7 +1,7 @@
 package com.example.vbook.data.parsers
 
 import android.util.Log
-import com.example.vbook.data.model.Book
+import com.example.vbook.domain.model.Book
 import org.jsoup.Jsoup
 import javax.inject.Inject
 import com.google.gson.GsonBuilder
@@ -23,7 +23,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         val url=base_url+book.bookURL
         var jsonMp3=""
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
-            .referrer("http://www.google.com").get()
+            .referrer("http://www.google.com").timeout(1000).get()
         val scripts =doc.getElementsByTag("script")
         for(i in scripts){
             val list = Regex("[\\[{].+[\\}]]").find(i.toString())?.next()?.value
@@ -55,7 +55,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         val list:MutableList<Book> = mutableListOf()
 
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
-            .referrer("http://www.google.com").get()
+            .referrer("http://www.google.com").timeout(1000).get()
         val books = doc.select(".bookkitem")
 
         for(element in books){

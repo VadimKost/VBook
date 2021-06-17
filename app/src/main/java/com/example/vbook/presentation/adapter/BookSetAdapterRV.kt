@@ -1,15 +1,15 @@
-package com.example.vbook.adapter
+package com.example.vbook.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.vbook.data.model.Book
+import com.example.vbook.domain.model.Book
 import com.example.vbook.databinding.BookItemBinding
 
 class BookSetAdapterRV(var books: MutableList<Book>,val onItemClicked:(Int)->Unit): RecyclerView.Adapter<BookSetAdapterRV.LinkHolder>() {
     inner class LinkHolder(val binding: BookItemBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int){
-            binding.book=books.toList().get(position)
+            binding.book=books.get(position)
             binding.executePendingBindings()
             binding.root.setOnClickListener{
                 onItemClicked(position)
