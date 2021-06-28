@@ -1,6 +1,12 @@
 package com.example.vbook.presentation.bookdetailed
 
+import android.content.ComponentName
+import android.content.Context.BIND_AUTO_CREATE
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
+import android.os.RemoteException
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,9 +22,21 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import com.google.android.exoplayer2.SimpleExoPlayer
 import kotlinx.coroutines.flow.collect
+import android.support.v4.media.session.MediaControllerCompat
+import com.example.vbook.data.mediaservice.MediaService
+import android.support.v4.media.session.PlaybackStateCompat
+
+import com.example.vbook.presentation.MainActivity
+
+
+
+
 
 @AndroidEntryPoint
 class BookDetailedFragment : Fragment() {
+    var playerServiceBinder: MediaService.PlayerServiceBinder? = null
+    var mediaController: MediaControllerCompat? = null
+
     lateinit var binding:FragmentBookDetailedBinding
 
     val vm: BookDetailedVM by lazy {
@@ -32,18 +50,39 @@ class BookDetailedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding= FragmentBookDetailedBinding.inflate(inflater,container,false)
-        val player = SimpleExoPlayer.Builder(requireContext()).build()
-        binding.videoView.setPlayer(player)
 
-        lifecycleScope.launch {
-            val mediaItemList= mutableListOf<MediaItem>()
-            for(i in vm.getBookDetailed(vm.bookList.get(args.bookIndex))?.mp3List!!){
-                mediaItemList.add(MediaItem.fromUri(i.second))
+        context?.bindService(Intent(context,MediaService::class.java),object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                playerServiceBinder = service as MediaService.PlayerServiceBinder
+                try {
+                    mediaController = MediaControllerCompat(
+                        context, playerServiceBinder!!.mediaSessionToken
+                    )
+                    mediaController!!.registerCallback(
+                        object : MediaControllerCompat.Callback() {
+                            override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
+                                if (state == null) return
+                            }
+                        }
+                    )
+                } catch (e: RemoteException) {
+                    mediaController = null
+                }
             }
-            player.setMediaItems(mediaItemList)
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+                playerServiceBinder = null;
+                mediaController = null;
+            }
+
+        },BIND_AUTO_CREATE)
+
+        binding.play.setOnClickListener {
+            mediaController?.getTransportControls()?.play()
         }
-        player.prepare();
-        player.play();
+        binding.pause.setOnClickListener {
+            mediaController?.getTransportControls()?.pause()
+        }
 
         lifecycleScope.launch {
             vm.actions.collect{
