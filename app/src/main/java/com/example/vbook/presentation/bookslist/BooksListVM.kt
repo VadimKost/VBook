@@ -1,5 +1,6 @@
 package com.example.vbook.presentation.bookslist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.vbook.data.repository.BookRepositoryImpl
 import com.example.vbook.domain.common.InMemoryStorage
@@ -32,6 +33,8 @@ class BooksListVM @Inject constructor(
     }
 
     suspend fun loadMoreNewBooks(){
+        Log.e("VVV",page.toString())
+        Log.e("VVV",bookList.toString())
         getPartOfNewBooks.execute(page++).collect {
             when(it){
                 is Resurce.Success -> _actions.value=ActionAndState.updateRV()

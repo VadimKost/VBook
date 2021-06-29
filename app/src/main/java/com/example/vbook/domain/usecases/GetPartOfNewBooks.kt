@@ -1,6 +1,6 @@
 package com.example.vbook.domain.usecases
 
-import com.example.vbook.data.repository.BookRepositoryImpl
+import com.example.vbook.ThrowableHandler
 import com.example.vbook.domain.common.Resurce
 import com.example.vbook.domain.repository.BookRepository
 import kotlinx.coroutines.flow.catch
@@ -14,6 +14,6 @@ class GetPartOfNewBooks @Inject constructor(
     suspend fun execute(page:Int) =
         bookRepository.getBooks(page)
         .catch { e ->
-            emit(Resurce.Error("Offline or other shit"))
+            emit(ThrowableHandler(e))
         }
 }

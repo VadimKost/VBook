@@ -1,5 +1,6 @@
 package com.example.vbook.domain.usecases
 
+import com.example.vbook.ThrowableHandler
 import com.example.vbook.domain.common.Resurce
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.repository.BookRepository
@@ -15,6 +16,6 @@ class GetBookDetailed @Inject constructor(
     suspend fun execute(book: Book) =
         bookRepository.getBookDetailed(book)
             .catch { e ->
-                emit(Resurce.Error("Offline or other shit"))
+                emit(ThrowableHandler(e))
             }
 }

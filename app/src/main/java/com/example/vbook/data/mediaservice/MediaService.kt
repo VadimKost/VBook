@@ -28,28 +28,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationCompat
 import com.example.vbook.R
 
-import com.google.android.exoplayer2.offline.DownloadService.startForeground
-import java.time.temporal.TemporalAdjusters.previous
-import android.media.AudioManager
-
-import android.media.AudioFocusRequest
-
-import android.app.NotificationManager
-
-import android.app.NotificationChannel
-
-import android.annotation.SuppressLint
-import android.content.Context
-
-import android.os.Build
-
-
-
-
-
-
-
-
 @AndroidEntryPoint
 class MediaService: Service() {
     private val NOTIFICATION_ID = 404

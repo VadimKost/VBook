@@ -1,5 +1,6 @@
 package com.example.vbook.data.repository
 
+import android.util.Log
 import com.example.vbook.data.parsers.BooksParser
 import com.example.vbook.data.parsers.KnigaVUheParser
 import com.example.vbook.domain.common.InMemoryStorage
@@ -18,28 +19,32 @@ import javax.inject.Singleton
 @Singleton
 class BookRepositoryImpl @Inject constructor(
     val inMemoryStorage: InMemoryStorage,
-    val knigaVUheParser: KnigaVUheParser
+    val parsers:List<BooksParser>
 ): BookRepository {
-    val parsers = listOf<BooksParser>(knigaVUheParser)
+
 
     override suspend fun getBooks(page:Int): Flow<Resurce<List<Book>>> {
         return flow {
             val books=parsers.first().getAllBookList(page)
-            inMemoryStorage.books.apply {
-                addAll(books)
-                distinct()
-            }
+            val difference=books-inMemoryStorage.books.toSet()
+            Log.e("VVVd",difference.toString())
+            inMemoryStorage.books.addAll(difference)
           emit(Resurce.Success(books))
         }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun getBookDetailed(book: Book): Flow<Resurce<Book>> {
         return flow {
-            val bookDetailed:Book =when(book.source){
-                    KnigaVUheParser.TAG-> knigaVUheParser.getBookDetailed(book)
-                    else -> book
+            var bookDetailed:Book
+            for(parser in parsers){
+                if (parser.TAG == book.source){
+                    bookDetailed=parser.getBookDetailed(book)
+                    emit(Resurce.Success(bookDetailed))
+                }else{
+                    throw NullPointerException("Empty book")
+                }
             }
-            emit(Resurce.Success(bookDetailed))
+
         }.flowOn(Dispatchers.IO)
     }
 

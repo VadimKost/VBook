@@ -9,9 +9,7 @@ import com.google.gson.reflect.TypeToken
 
 
 class KnigaVUheParser @Inject constructor() : BooksParser() {
-    companion object{
-        val TAG: String="KnigaVUheParser"
-    }
+    override val TAG: String="KnigaVUheParser"
 
     override val base_url: String="https://knigavuhe.org/"
 
@@ -55,7 +53,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         val list:MutableList<Book> = mutableListOf()
 
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
-            .referrer("http://www.google.com").timeout(1000).get()
+            .referrer("http://www.google.com").timeout(2000).get()
         val books = doc.select(".bookkitem")
 
         for(element in books){

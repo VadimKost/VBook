@@ -1,6 +1,7 @@
 package com.example.vbook.di
 
 import com.example.vbook.data.InMemoryStorageImpl
+import com.example.vbook.data.parsers.BooksParser
 import com.example.vbook.data.parsers.KnigaVUheParser
 import com.example.vbook.data.repository.BookRepositoryImpl
 import com.example.vbook.domain.common.InMemoryStorage
@@ -18,7 +19,11 @@ class RepositoryModule {
     @Provides
     @Singleton
     fun provideBookRepository(
-        inMemoryStorage: InMemoryStorage,
-        knigaVUheParser: KnigaVUheParser
-    ): BookRepository = BookRepositoryImpl(inMemoryStorage, knigaVUheParser)
+        inMemoryStorage: InMemoryStorage
+    ): BookRepository = BookRepositoryImpl(
+        inMemoryStorage,
+        listOf(
+            KnigaVUheParser(),
+        )
+    )
 }
