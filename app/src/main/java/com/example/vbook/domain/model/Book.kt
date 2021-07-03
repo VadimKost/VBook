@@ -1,6 +1,6 @@
 package com.example.vbook.domain.model
 
-
+import androidx.room.ColumnInfo
 
 data class Book(
     var source:String,
@@ -13,5 +13,8 @@ data class Book(
     val cycle:Pair<String,String>,
     var cycleBookList: List<Pair<String,String>>?=null,
     var duration: String?=null,
+    var isCurrent:Boolean,
+    var stoppedTrackIndex:Int=0,
+    var stoppedTrackTime: Float=0.0F,
 )
 //Pair( title url)

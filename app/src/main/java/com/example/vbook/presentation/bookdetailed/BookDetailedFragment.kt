@@ -17,19 +17,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.example.vbook.databinding.FragmentBookDetailedBinding
 import com.example.vbook.presentation.bookslist.BooksListVM
-import com.google.android.exoplayer2.MediaItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.google.android.exoplayer2.SimpleExoPlayer
 import kotlinx.coroutines.flow.collect
 import android.support.v4.media.session.MediaControllerCompat
 import com.example.vbook.data.mediaservice.MediaService
 import android.support.v4.media.session.PlaybackStateCompat
-
-import com.example.vbook.presentation.MainActivity
-
-
-
 
 
 @AndroidEntryPoint
@@ -51,7 +44,7 @@ class BookDetailedFragment : Fragment() {
     ): View? {
         binding= FragmentBookDetailedBinding.inflate(inflater,container,false)
 
-        context?.bindService(Intent(context,MediaService::class.java),object : ServiceConnection {
+        context?.bindService(Intent(context, MediaService::class.java),object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 playerServiceBinder = service as MediaService.PlayerServiceBinder
                 try {

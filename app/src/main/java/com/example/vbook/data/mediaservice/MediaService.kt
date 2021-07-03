@@ -13,7 +13,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import android.app.PendingIntent
-import com.example.vbook.domain.common.InMemoryStorage
 import com.example.vbook.domain.model.Book
 
 import com.example.vbook.presentation.MainActivity
@@ -34,8 +33,6 @@ class MediaService: Service() {
     private val NOTIFICATION_DEFAULT_CHANNEL_ID = "default_channel"
     @Inject
     lateinit var exoPlayer: SimpleExoPlayer
-    @Inject
-    lateinit var inMemoryStorage: InMemoryStorage
 
     private val metadataBuilder = MediaMetadataCompat.Builder()
 
@@ -94,8 +91,8 @@ class MediaService: Service() {
     val mediaSessionCallback=object :MediaSessionCompat.Callback(){
         var currentState = PlaybackStateCompat.STATE_STOPPED
         override fun onPlay() {
-            val book=inMemoryStorage.books.get(0)
-            updateMetadataFromBook(book)
+//            val book=inMemoryStorage.books.get(0)
+//            updateMetadataFromBook(book)
 
             mediaSession!!.setActive(true);
 

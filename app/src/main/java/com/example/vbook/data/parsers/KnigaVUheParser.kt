@@ -36,7 +36,6 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         val itemsListType = object : TypeToken<List<BookMedia>>() {}.type
         val list=gson.fromJson<List<BookMedia>>(jsonMp3,itemsListType)
         val mp3List= mutableListOf<Pair<String,String>>()
-        Log.e("VVV",list.toString())
         for(i in list){
             mp3List.add(i.title to i.url)
         }
@@ -75,7 +74,8 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
                 author = author to authorURL,
                 bookURL = bookURL,
                 reader = reader to readerURL,
-                cycle = cycle to cycleURL
+                cycle = cycle to cycleURL,
+                isCurrent = false
             )
             list.add(book)
         }

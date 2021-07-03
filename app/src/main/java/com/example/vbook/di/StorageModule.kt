@@ -1,10 +1,13 @@
 package com.example.vbook.di
 
-import com.example.vbook.data.InMemoryStorageImpl
-import com.example.vbook.domain.common.InMemoryStorage
+import android.content.Context
+import androidx.room.Room
+
+import com.example.vbook.data.db.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -14,5 +17,9 @@ class StorageModule {
 
     @Provides
     @Singleton
-    fun provideStorage():InMemoryStorage=InMemoryStorageImpl()
+    fun provideDB(@ApplicationContext context:Context):AppDatabase
+    = Room.databaseBuilder(
+        context,
+        AppDatabase::class.java, "VBookDB"
+    ).build()
 }
