@@ -1,19 +1,14 @@
 package com.example.vbook.data.repository
 
-import android.util.Log
 import com.example.vbook.data.db.AppDatabase
-import com.example.vbook.data.db.model.BookEntity
-import com.example.vbook.data.parsers.BooksParser
+import com.example.vbook.data.mapper.toBook
+import com.example.vbook.data.mapper.toBookEntity
+import com.example.vbook.data.mapper.toBookEntityList
 import com.example.vbook.data.parsers.KnigaVUheParser
-import com.example.vbook.domain.common.Resurce
+import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.repository.BookRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
+import com.example.vbook.isDetailed
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,36 +19,53 @@ class BookRepositoryImpl @Inject constructor(
     val knigaVUheParser: KnigaVUheParser
 ): BookRepository {
 
-    override suspend fun fetchNewBooks(page:Int): Flow<Resurce<List<Book>>> {
-        return flow {
-            val books=knigaVUheParser.getAllBookList(page)
-            Log.e("VVV",books.toString())
-            Log.e("VVV",BookEntity.fromBookList(books).toString())
-            DB.userDao().insert(BookEntity.fromBookList(books))
-
-            emit(Resurce.Success(books))
-        }.flowOn(Dispatchers.IO)
+    override suspend fun fetchNewBooks(page:Int): Resource<List<Book>> {
+        val books=knigaVUheParser.getAllNewBooks(page)
+        val booksEntity = books.toBookEntityList()
+        DB.bookDao().insert(booksEntity)
+        return Resource.Success(books)
     }
 
-    override suspend fun getBookDetailed(book: Book): Flow<Resurce<Book>> {
-        return flow {
-            val bookDetailed=knigaVUheParser.getBookDetailed(book)
-            DB.userDao().updateBook(BookEntity.fromBook(bookDetailed))
+    override suspend fun getBook(title:String,author:Pair<String,String>):Resource<Book>{
+        val bookEntity= DB.bookDao().getBook(title, author)
+        if (bookEntity !=null){
+            return Resource.Success(bookEntity.toBook())
+        }else{
+            return Resource.Error("Empty Book")
+        }
+    }
 
-            DB.userDao().getBook(bookDetailed.title,bookDetailed.author).collect {
-                emit(Resurce.Success(BookEntity.toBook(it)))
+    override suspend fun getBookDetailed(book: Book): Resource<Book>{
+        val bookDetailed=DB.bookDao().getBook(book.title,book.author)
+        if (bookDetailed != null) {
+            if (bookDetailed.isDetailed()){
+                return Resource.Success(bookDetailed.toBook())
+            }else{
+                val bookDetailed=knigaVUheParser.getBookDetailed(book)
+                DB.bookDao().insert(listOf(bookDetailed.toBookEntity()))
+                return Resource.Success(bookDetailed)
             }
-
-        }.flowOn(Dispatchers.IO)
+        }else{
+            return Resource.Error("Empty Book")
+        }
     }
 
-    override suspend fun getCurrentBook(): Flow<Resurce<Book>> {
-        return flow {
-            DB.userDao().getCurrentBook().collect{
-                emit(Resurce.Success(BookEntity.toBook(it)))
-            }
-        }.flowOn(Dispatchers.IO)
+    override suspend fun getCurrentBook(): Resource<Book> {
+        val bookEntity = DB.bookDao().getCurrentBook()
+        if (bookEntity != null){
+            return Resource.Success(bookEntity.toBook())
+        }else{
+            return Resource.Error("NoCurrentBook")
+        }
     }
+
+
+    override suspend fun updateBook(book: Book):Boolean{
+        val count = DB.bookDao().updateBook(book.toBookEntity())
+        return count>=1
+    }
+
+
 
 }
 

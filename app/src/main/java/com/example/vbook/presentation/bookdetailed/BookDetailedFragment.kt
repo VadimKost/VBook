@@ -21,8 +21,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collect
 import android.support.v4.media.session.MediaControllerCompat
-import com.example.vbook.data.mediaservice.MediaService
+import com.example.vbook.presentation.mediaservice.MediaService
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
+import com.example.vbook.domain.common.ActionAndState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 @AndroidEntryPoint
@@ -32,9 +36,9 @@ class BookDetailedFragment : Fragment() {
 
     lateinit var binding:FragmentBookDetailedBinding
 
-    val vm: BookDetailedVM by lazy {
-        ViewModelProvider(this).get(BookDetailedVM::class.java)
-    }
+    lateinit var vm: BookDetailedVM
+
+
 
     val args: BookDetailedFragmentArgs by navArgs()
 
@@ -42,7 +46,23 @@ class BookDetailedFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        vm=ViewModelProvider(this).get(BookDetailedVM::class.java)
         binding= FragmentBookDetailedBinding.inflate(inflater,container,false)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            vm.getBookDetailed(args.title,args.authorURL to args.author)
+            withContext(Dispatchers.Main){
+                vm.actions.collect{
+                    when(it){
+                        is ActionAndState.showToast-> Toast.makeText(
+                            requireContext(),
+                            it.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
 
         context?.bindService(Intent(context, MediaService::class.java),object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -75,18 +95,6 @@ class BookDetailedFragment : Fragment() {
         }
         binding.pause.setOnClickListener {
             mediaController?.getTransportControls()?.pause()
-        }
-
-        lifecycleScope.launch {
-            vm.actions.collect{
-                when(it){
-                    is BooksListVM.ActionAndState.showToast-> Toast.makeText(
-                        requireContext(),
-                        it.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
         }
 
         return binding.root

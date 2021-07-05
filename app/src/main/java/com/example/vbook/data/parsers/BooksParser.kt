@@ -6,7 +6,7 @@ abstract class BooksParser {
     abstract val base_url: String
     abstract val TAG: String
 
-    abstract fun getAllBookList(page:Int):List<Book>
+    abstract fun getAllNewBooks(page:Int):List<Book>
 
     abstract fun getBookDetailed(book: Book):Book
 

@@ -1,12 +1,13 @@
 package com.example.vbook.domain.repository
 
-import com.example.vbook.domain.common.Resurce
+import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.model.Book
-import kotlinx.coroutines.flow.Flow
 
 interface BookRepository {
-    suspend fun fetchNewBooks(page:Int): Flow<Resurce<List<Book>>>
-    suspend fun getBookDetailed(book: Book): Flow<Resurce<Book>>
+    suspend fun fetchNewBooks(page:Int): Resource<List<Book>>
+    suspend fun getBookDetailed(book: Book): Resource<Book>
+    suspend fun getCurrentBook(): Resource<Book>
+    suspend fun getBook(title:String,author:Pair<String,String>):Resource<Book>
 
-    suspend fun getCurrentBook(): Flow<Resurce<Book>>
+    suspend fun updateBook(book: Book):Boolean
 }

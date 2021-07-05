@@ -5,10 +5,9 @@ import com.example.vbook.domain.repository.BookRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
-class GetBookDetailed @Inject constructor(
+class GetCurrentBook @Inject constructor(
     val bookRepository: BookRepository
-) {
-    suspend operator fun invoke(book: Book) = bookRepository.getBookDetailed(book)
+){
+    suspend operator fun invoke()=bookRepository.getCurrentBook()
 }

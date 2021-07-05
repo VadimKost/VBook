@@ -15,6 +15,7 @@ data class Book(
     var duration: String?=null,
     var isCurrent:Boolean,
     var stoppedTrackIndex:Int=0,
-    var stoppedTrackTime: Float=0.0F,
+    var stoppedTrackTime: Long=0,
 )
+
 //Pair( title url)

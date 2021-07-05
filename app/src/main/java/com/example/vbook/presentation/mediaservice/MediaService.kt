@@ -1,4 +1,4 @@
-package com.example.vbook.data.mediaservice
+package com.example.vbook.presentation.mediaservice
 
 import android.app.Service
 import android.content.Intent
@@ -20,19 +20,34 @@ import com.google.android.exoplayer2.MediaItem
 import android.os.Binder
 import androidx.media.session.MediaButtonReceiver
 import android.app.Notification
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 
 import androidx.core.content.ContextCompat
 
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationCompat
 import com.example.vbook.R
+import com.example.vbook.domain.common.Resource
+import com.example.vbook.domain.usecases.GetCurrentBook
+import com.example.vbook.domain.usecases.UpdateBook
+import kotlinx.coroutines.*
 
 @AndroidEntryPoint
 class MediaService: Service() {
     private val NOTIFICATION_ID = 404
     private val NOTIFICATION_DEFAULT_CHANNEL_ID = "default_channel"
+
+    @Inject
+    lateinit var getCurrentBook: GetCurrentBook
+    @Inject
+    lateinit var updateBook: UpdateBook
+
     @Inject
     lateinit var exoPlayer: SimpleExoPlayer
+
+    lateinit var currentBook: Book
 
     private val metadataBuilder = MediaMetadataCompat.Builder()
 
@@ -91,39 +106,63 @@ class MediaService: Service() {
     val mediaSessionCallback=object :MediaSessionCompat.Callback(){
         var currentState = PlaybackStateCompat.STATE_STOPPED
         override fun onPlay() {
-//            val book=inMemoryStorage.books.get(0)
-//            updateMetadataFromBook(book)
+            GlobalScope.launch{
+                val book = getCurrentBook()
+                if (book is Resource.Success){
+                    currentBook=book.data
+                    updateMetadataFromBook(currentBook)
 
-            mediaSession!!.setActive(true);
+                    mediaSession!!.setActive(true);
 
-            // Сообщаем новое состояние
-            mediaSession!!.setPlaybackState(
-                stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
-                    PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1F).build());
+                    // Сообщаем новое состояние
+                    mediaSession!!.setPlaybackState(
+                        stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
+                            PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1F).build());
 
-            // Загружаем URL аудио-файла в ExoPlayer
-            val mediaItem = MediaItem.fromUri("https://s12.knigavuhe.org//1//audio//28555//aleksejj-rakitin-istorija-gadkogo-utjonka-ch-1-muz.mp3")
-            exoPlayer.setMediaItem(mediaItem)
-            exoPlayer.prepare()
-            // Запускаем воспроизведение
-            exoPlayer.setPlayWhenReady(true);
+                    // Загружаем URL аудио-файла в ExoPlayer
+                    val url= currentBook.mp3List?.get(currentBook.stoppedTrackIndex)?.second
+                    Log.e("VVV",url!!)
+                    val mediaItem = MediaItem.fromUri(url!!)
+                    withContext(Dispatchers.Main){
+                        exoPlayer.setMediaItem(mediaItem)
+                        exoPlayer.prepare()
 
-            mediaSession!!.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1F).build());
-            currentState = PlaybackStateCompat.STATE_PLAYING;
+                        exoPlayer.seekTo(currentBook.stoppedTrackTime)
+                        // Запускаем воспроизведение
+                        exoPlayer.setPlayWhenReady(true);
+                    }
 
-            refreshNotificationAndForegroundStatus(currentState);
-        }
+                    mediaSession!!.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1F).build());
+                    currentState = PlaybackStateCompat.STATE_PLAYING;
 
+                    refreshNotificationAndForegroundStatus(currentState);
+                }else if (book is Resource.Error){
+                    withContext(Dispatchers.Main){
+                        Toast.makeText(this@MediaService, book.message, Toast.LENGTH_SHORT).show()
+                    }
+
+                    }
+
+                }
+
+            }
         override fun onPause() {
             if (exoPlayer.getPlayWhenReady()) {
                 exoPlayer.setPlayWhenReady(false);
+                currentBook.stoppedTrackTime=exoPlayer.currentPosition
+                runBlocking {
+                    updateBook.invoke(currentBook)
+                }
             }
             mediaSession!!.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1F).build());
             currentState = PlaybackStateCompat.STATE_PAUSED;
 
             refreshNotificationAndForegroundStatus(currentState);
         }
-    }
+        }
+
+
+
 
     inner class PlayerServiceBinder : Binder() {
         val mediaSessionToken: MediaSessionCompat.Token = mediaSession!!.sessionToken

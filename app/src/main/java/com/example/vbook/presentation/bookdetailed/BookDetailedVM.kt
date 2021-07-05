@@ -1,43 +1,51 @@
 package com.example.vbook.presentation.bookdetailed
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.vbook.domain.common.ActionAndState
 import com.example.vbook.domain.model.Book
-import com.example.vbook.domain.common.Resurce
+import com.example.vbook.domain.common.Resource
+import com.example.vbook.domain.usecases.GetBook
 import com.example.vbook.domain.usecases.GetBookDetailed
-import com.example.vbook.presentation.bookslist.BooksListVM
+import com.example.vbook.domain.usecases.MakeBookCurrent
+import com.example.vbook.isDetailed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @HiltViewModel
 class BookDetailedVM @Inject constructor(
-    val getBookDetailed: GetBookDetailed,
+    private val getDetailedBook: GetBookDetailed,
+    private val makeBookCurrent: MakeBookCurrent,
+    private val getBook: GetBook
 ): ViewModel() {
-//    val bookList= inMemoryStorage.books
 
-    private val _actions: MutableStateFlow<BooksListVM.ActionAndState> =
-        MutableStateFlow(BooksListVM.ActionAndState.updateRV())
+    private val _actions: MutableStateFlow<ActionAndState> =
+        MutableStateFlow(ActionAndState.idle())
+    val actions: StateFlow<ActionAndState> =_actions
 
-    val  actions: StateFlow<BooksListVM.ActionAndState> =_actions
+    private val _book: MutableStateFlow<Book?> = MutableStateFlow(null)
+    val  book: StateFlow<Book?> =_book
 
-
-    suspend fun getBookDetailed(book:Book):Book?{
-        var result: Book? =null
-        getBookDetailed.execute(book).collect {
-                when(it){
-                    is Resurce.Success -> result=it.data
-                    is Resurce.Error ->
-                        _actions.value= BooksListVM.ActionAndState.showToast(it.message)
+    suspend fun getBookDetailed(title:String,author:Pair<String,String>){
+        val bookEntity = getBook(title, author)
+        when(bookEntity){
+            is Resource.Success -> {
+                if (bookEntity.data.isDetailed()){
+                    makeBookCurrent(bookEntity.data)
+                    _book.value=bookEntity.data
+                    Log.e("bookEntityD",bookEntity.data.toString())
+                }else{
+                    getDetailedBook(bookEntity.data)
+                    makeBookCurrent(bookEntity.data)
+                    _book.value=bookEntity.data
+                    Log.e("bookEntity",bookEntity.data.toString())
                 }
             }
-        return result
+            is Resource.Error -> {
+                _actions.value=ActionAndState.showToast(bookEntity.message)
+            }
         }
-
-
-    sealed class ActionAndState{
-        class updateRV:ActionAndState()
-        class showToast(val message:String):ActionAndState()
     }
 }

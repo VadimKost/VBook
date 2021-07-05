@@ -13,10 +13,6 @@
         <action
             android:id="@+id/action_bookList_to_bookDetailedFragment"
             app:destination="@id/bookDetailedFragment">
-            <argument
-                android:name="myArg"
-                app:argType="integer"
-                android:defaultValue="1" />
         </action>
     </fragment>
     <fragment
@@ -25,7 +21,13 @@
         android:label="fragment_book_detailed"
         tools:layout="@layout/fragment_book_detailed" >
         <argument
-            android:name="bookIndex"
-            app:argType="integer" />
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="authorURL"
+            app:argType="string" />
+        <argument
+            android:name="author"
+            app:argType="string" />
     </fragment>
 </navigation>

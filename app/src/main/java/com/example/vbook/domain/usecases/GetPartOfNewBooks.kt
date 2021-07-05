@@ -10,9 +10,5 @@ import javax.inject.Singleton
 class GetPartOfNewBooks @Inject constructor(
    val bookRepository: BookRepository
 ) {
-    suspend fun execute(page:Int) =
-        bookRepository.fetchNewBooks(page)
-        .catch { e ->
-            emit(ThrowableHandler(e))
-        }
+    suspend fun invoke(page:Int) = bookRepository.fetchNewBooks(page)
 }

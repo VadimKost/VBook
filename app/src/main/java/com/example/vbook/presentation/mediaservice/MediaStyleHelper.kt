@@ -1,4 +1,4 @@
-package com.example.vbook.data.mediaservice
+package com.example.vbook.presentation.mediaservice
 
 import android.content.Context
 import android.support.v4.media.session.PlaybackStateCompat

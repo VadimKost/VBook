@@ -1,6 +1,7 @@
 package com.example.vbook.presentation.bookslist
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.vbook.presentation.adapter.BookSetAdapterRV
 import com.example.vbook.databinding.FragmentBookListBinding
+import com.example.vbook.domain.common.ActionAndState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -29,10 +32,13 @@ class BooksListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding=FragmentBookListBinding.inflate(inflater,container,false)
-
-        val adapterRV =BookSetAdapterRV(vm.bookList){
+        lifecycleScope.launch(Dispatchers.IO){
+            vm.loadMoreNewBooks()
+        }
+        val adapterRV =BookSetAdapterRV(vm.bookList){title,authorURL,author ->
             val action = BooksListFragmentDirections
-                .actionBookListToBookDetailedFragment(bookIndex = it)
+                .actionBookListToBookDetailedFragment(title, authorURL, author)
+            Log.e("VVV",title+" "+authorURL+" " +author)
             findNavController().navigate(action)
         }
         binding.rv.adapter=adapterRV
@@ -41,8 +47,8 @@ class BooksListFragment : Fragment() {
         lifecycleScope.launch {
             vm.actions.collect{
                 when(it){
-                    is BooksListVM.ActionAndState.updateRV ->adapterRV.notifyDataSetChanged()
-                    is BooksListVM.ActionAndState.showToast-> Toast.makeText(
+                    is ActionAndState.updateRV ->adapterRV.notifyDataSetChanged()
+                    is ActionAndState.showToast-> Toast.makeText(
                         requireContext(),
                         it.message,
                         Toast.LENGTH_SHORT
@@ -51,7 +57,7 @@ class BooksListFragment : Fragment() {
             }
         }
         binding.fab.setOnClickListener {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 vm.loadMoreNewBooks()
             }
         }

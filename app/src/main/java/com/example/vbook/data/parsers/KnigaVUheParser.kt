@@ -13,11 +13,12 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
 
     override val base_url: String="https://knigavuhe.org/"
 
-    override fun getAllBookList(page: Int): MutableList<Book> {
+    override fun getAllNewBooks(page: Int): MutableList<Book> {
         return parseBookList("new/?page=$page")
     }
 
     override fun getBookDetailed(book: Book): Book {
+        Log.e("getBookDetailedPar",book.toString())
         val url=base_url+book.bookURL
         var jsonMp3=""
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
@@ -40,6 +41,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
             mp3List.add(i.title to i.url)
         }
         book.mp3List=mp3List
+        Log.e("getBookDetailedPar",book.toString())
         return book
     }
 
@@ -66,7 +68,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
             val readerURL=bookkitem_meta.select(".-reader").next().next().select("a").attr("href")
             val cycle=bookkitem_meta.select(".-serie").next().select("a").text()
             val cycleURL=bookkitem_meta.select(".-serie").next().select("a").attr("href")
-
+            Log.e("PAR",(author to authorURL).toString())
             val book= Book(
                 source= TAG,
                 title = title,

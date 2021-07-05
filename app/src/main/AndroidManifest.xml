@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VBook">
         <service
-            android:name="com.example.vbook.data.mediaservice.MediaService"
+            android:name="com.example.vbook.presentation.mediaservice.MediaService"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
