@@ -2,7 +2,7 @@ package com.example.vbook.presentation.bookdetailed
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.vbook.domain.common.ActionAndState
+import com.example.vbook.domain.common.Action
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.usecases.GetBook
@@ -21,9 +21,9 @@ class BookDetailedVM @Inject constructor(
     private val getBook: GetBook
 ): ViewModel() {
 
-    private val _actions: MutableStateFlow<ActionAndState> =
-        MutableStateFlow(ActionAndState.idle())
-    val actions: StateFlow<ActionAndState> =_actions
+    private val _actions: MutableStateFlow<Action> =
+        MutableStateFlow(Action.idle())
+    val actions: StateFlow<Action> =_actions
 
     private val _book: MutableStateFlow<Book?> = MutableStateFlow(null)
     val  book: StateFlow<Book?> =_book
@@ -44,7 +44,7 @@ class BookDetailedVM @Inject constructor(
                 }
             }
             is Resource.Error -> {
-                _actions.value=ActionAndState.showToast(bookEntity.message)
+                _actions.value=Action.showToast(bookEntity.message)
             }
         }
     }

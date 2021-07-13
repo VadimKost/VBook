@@ -101,6 +101,7 @@ class MediaService: Service() {
         super.onDestroy()
         // Ресурсы освобождать обязательно
         mediaSession!!.release()
+        exoPlayer.release()
     }
 
     val mediaSessionCallback=object :MediaSessionCompat.Callback(){
@@ -124,6 +125,7 @@ class MediaService: Service() {
                     Log.e("VVV",url!!)
                     val mediaItem = MediaItem.fromUri(url!!)
                     withContext(Dispatchers.Main){
+//                        startService(Intent(applicationContext, MediaService::class.java))
                         exoPlayer.setMediaItem(mediaItem)
                         exoPlayer.prepare()
 
@@ -151,7 +153,7 @@ class MediaService: Service() {
                 exoPlayer.setPlayWhenReady(false);
                 currentBook.stoppedTrackTime=exoPlayer.currentPosition
                 runBlocking {
-                    updateBook.invoke(currentBook)
+                    updateBook(currentBook)
                 }
             }
             mediaSession!!.setPlaybackState(stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1F).build());

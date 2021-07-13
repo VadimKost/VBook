@@ -1,7 +1,7 @@
 package com.example.vbook.presentation.bookslist
 
 import androidx.lifecycle.ViewModel
-import com.example.vbook.domain.common.ActionAndState
+import com.example.vbook.domain.common.Action
 import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.usecases.GetPartOfNewBooks
@@ -17,18 +17,19 @@ class BooksListVM @Inject constructor(
     var page=1
     var bookList= mutableListOf<Book>()
 
-    private val _actions:MutableStateFlow<ActionAndState> =
-        MutableStateFlow(ActionAndState.idle())
-    val  actions:StateFlow<ActionAndState> =_actions
+    private val _actions:MutableStateFlow<Action> =
+        MutableStateFlow(Action.idle())
+    val  actions:StateFlow<Action> =_actions
 
     suspend fun loadMoreNewBooks(){
-        val books= getPartOfNewBooks.invoke(page++)
+        val books= getPartOfNewBooks.invoke(page)
             when(books){
                 is Resource.Success -> {
+                    page+=1
                     bookList.addAll(books.data)
-                    _actions.value = ActionAndState.updateRV()
+                    _actions.value = Action.updateRV()
                 }
-                is Resource.Error -> _actions.value=ActionAndState.showToast(books.message)
+                is Resource.Error -> _actions.value=Action.showToast(books.message)
             }
         }
     }

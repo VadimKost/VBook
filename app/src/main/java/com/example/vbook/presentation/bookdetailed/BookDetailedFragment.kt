@@ -16,15 +16,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.example.vbook.databinding.FragmentBookDetailedBinding
-import com.example.vbook.presentation.bookslist.BooksListVM
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collect
 import android.support.v4.media.session.MediaControllerCompat
 import com.example.vbook.presentation.mediaservice.MediaService
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
-import com.example.vbook.domain.common.ActionAndState
+import com.example.vbook.domain.common.Action
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -54,7 +52,7 @@ class BookDetailedFragment : Fragment() {
             withContext(Dispatchers.Main){
                 vm.actions.collect{
                     when(it){
-                        is ActionAndState.showToast-> Toast.makeText(
+                        is Action.showToast-> Toast.makeText(
                             requireContext(),
                             it.message,
                             Toast.LENGTH_SHORT

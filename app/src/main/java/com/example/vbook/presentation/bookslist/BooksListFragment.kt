@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.vbook.presentation.adapter.BookSetAdapterRV
 import com.example.vbook.databinding.FragmentBookListBinding
-import com.example.vbook.domain.common.ActionAndState
+import com.example.vbook.domain.common.Action
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -47,8 +47,8 @@ class BooksListFragment : Fragment() {
         lifecycleScope.launch {
             vm.actions.collect{
                 when(it){
-                    is ActionAndState.updateRV ->adapterRV.notifyDataSetChanged()
-                    is ActionAndState.showToast-> Toast.makeText(
+                    is Action.updateRV ->adapterRV.notifyDataSetChanged()
+                    is Action.showToast-> Toast.makeText(
                         requireContext(),
                         it.message,
                         Toast.LENGTH_SHORT

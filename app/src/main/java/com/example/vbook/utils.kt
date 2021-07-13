@@ -6,13 +6,14 @@ import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.model.Book
 import java.lang.IllegalStateException
 
-public fun <T>ThrowableHandler(e:Throwable):Resource<T>{
-    Log.e("VVVst", e.stackTraceToString())
+public fun <T>ThrowableHandler(e:Throwable,tag:String="defError"):Resource<T>{
+    Log.e(tag, e.stackTraceToString())
     return when(e){
         is IllegalStateException -> Resource.Error(e.message+" Error")
         else -> Resource.Error("Other Shit")
     }
 }
+
 
 fun Book.isDetailed():Boolean{
     return mp3List != null
