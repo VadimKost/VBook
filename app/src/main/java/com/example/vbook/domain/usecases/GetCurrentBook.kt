@@ -1,6 +1,6 @@
 package com.example.vbook.domain.usecases
 
-import com.example.vbook.ThrowableHandler
+import com.example.vbook.ThrowableResource
 import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.repository.BookRepository
@@ -15,7 +15,7 @@ class GetCurrentBook @Inject constructor(
         return try {
             bookRepository.getCurrentBook()
         }catch (e:Throwable){
-            ThrowableHandler(e,"GetCurrentBook")
+            ThrowableResource(e,"GetCurrentBook")
         }
     }
 }

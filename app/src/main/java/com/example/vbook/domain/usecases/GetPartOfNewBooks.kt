@@ -1,10 +1,9 @@
 package com.example.vbook.domain.usecases
 
-import com.example.vbook.ThrowableHandler
+import com.example.vbook.ThrowableResource
 import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.repository.BookRepository
-import kotlinx.coroutines.flow.catch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +15,7 @@ class GetPartOfNewBooks @Inject constructor(
         return try {
             bookRepository.fetchNewBooks(page)
         }catch (e:Throwable){
-            ThrowableHandler(e)
+            ThrowableResource(e)
         }
     }
 }

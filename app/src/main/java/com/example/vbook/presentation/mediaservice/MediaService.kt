@@ -26,9 +26,6 @@ class MediaService: Service() {
     lateinit var notificationManager: NotificationManager
     private var currentBook: Book? = null
     private var isForegroundService = false
-    private val NOTIFICATION_ID = 404
-    private val NOTIFICATION_DEFAULT_CHANNEL_ID = "default_channel"
-
     @Inject
     lateinit var getCurrentBook: GetCurrentBook
     @Inject
@@ -41,9 +38,13 @@ class MediaService: Service() {
     lateinit var mediaSession: MediaSessionCompat
 
     suspend fun updateCurrentBook(){
-        val book=getCurrentBook()
-        currentBook= if (book is Resource.Success) book.data else null
-        preparePlayList(currentBook!!)
+        val bookResource=getCurrentBook()
+        val book = if (bookResource is Resource.Success) bookResource.data else null
+        if (book != currentBook){
+            currentBook=book
+            preparePlayList(currentBook!!)
+        }
+
     }
     override fun onCreate() {
         super.onCreate()
@@ -87,7 +88,11 @@ class MediaService: Service() {
         Log.e("vas","i=${initialWindowIndex} and ms=${playbackStartPositionMs}")
 
         book.mp3List!!.forEachIndexed { index, track ->
-            player.addMediaItem(MediaItem.Builder().setUri(track.second).setMediaMetadata(getMediaDataFromBook(index)).build())
+            player.addMediaItem(MediaItem.Builder()
+                .setUri(track.second)
+                .setMediaMetadata(getMediaDataFromBook(index))
+                .build()
+            )
         }
 
         player.prepare()
@@ -96,6 +101,7 @@ class MediaService: Service() {
     fun getMediaDataFromBook(trackNumber: Int):MediaMetadata{
         return MediaMetadata.Builder()
             .setTitle(currentBook?.title)
+            .setArtist(currentBook?.author?.first)
             .setTrackNumber(trackNumber)
             .build()
     }

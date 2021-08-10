@@ -23,7 +23,8 @@ class NotificationManager(
 
         notificationManager = PlayerNotificationManager.Builder(
             context,1,"12",DescriptionAdapter(mediaController)
-        ).setNotificationListener(playerNotificationListener)
+        )
+            .setNotificationListener(playerNotificationListener)
             .build()
 //        notificationManager.setControlDispatcher(DefaultControlDispatcher())
         notificationManager.setMediaSessionToken(sessionToken)
@@ -45,12 +46,14 @@ class NotificationManager(
 
         override fun getCurrentContentText(player: Player): CharSequence {
             Log.e("player",player.currentMediaItem?.mediaMetadata?.title.toString())
-            return player.currentMediaItem?.mediaMetadata?.title.toString()
+            return player.currentMediaItem?.mediaMetadata?.artist.toString()
         }
 
 
-        override fun getCurrentContentTitle(player: Player) =
-            "title"
+        override fun getCurrentContentTitle(player: Player): CharSequence {
+            return player.currentMediaItem?.mediaMetadata?.title.toString()
+        }
+
 
         override fun getCurrentLargeIcon(
             player: Player,
