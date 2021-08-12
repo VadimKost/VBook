@@ -35,10 +35,11 @@ class BooksListFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO){
             vm.loadMoreNewBooks()
         }
-        val adapterRV =BookSetAdapterRV(vm.bookList){title,authorURL,author ->
+        val adapterRV =BookSetAdapterRV(vm.bookList){title,author,reader ->
             val action = BooksListFragmentDirections
-                .actionBookListToBookDetailedFragment(title, authorURL, author)
-            Log.e("VVV",title+" "+authorURL+" " +author)
+                .actionBookListToBookDetailedFragment(title,
+                    author.first,author.second,
+                    reader.first,reader.second)
             findNavController().navigate(action)
         }
         binding.rv.adapter=adapterRV

@@ -11,9 +11,11 @@ import javax.inject.Singleton
 class GetBook @Inject constructor(
     val booksRepository: BookRepository
 ) {
-    suspend operator fun invoke(title:String,author:Pair<String,String>): Resource<Book> {
+    suspend operator fun invoke(
+        title:String,author:Pair<String,String>,reader:Pair<String,String>
+    ): Resource<Book> {
         return try {
-            booksRepository.getBook(title, author)
+            booksRepository.getBook(title, author,reader)
         }catch (e:Throwable){
             ThrowableResource(e,"GetBook")
         }

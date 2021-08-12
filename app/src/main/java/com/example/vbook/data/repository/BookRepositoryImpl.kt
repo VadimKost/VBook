@@ -26,8 +26,12 @@ class BookRepositoryImpl @Inject constructor(
         return Resource.Success(books)
     }
 
-    override suspend fun getBook(title:String,author:Pair<String,String>):Resource<Book>{
-        val bookEntity= DB.bookDao().getBook(title, author)
+    override suspend fun getBook(
+        title: String,
+        author: Pair<String, String>,
+        reader: Pair<String, String>
+    ):Resource<Book>{
+        val bookEntity= DB.bookDao().getBook(title, author, reader)
         if (bookEntity !=null){
             return Resource.Success(bookEntity.toBook())
         }else{
@@ -35,13 +39,17 @@ class BookRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBookDetailed(book: Book): Resource<Book>{
-        val bookDetailed=DB.bookDao().getBook(book.title,book.author)
-        if (bookDetailed != null) {
-            if (bookDetailed.isDetailed()){
-                return Resource.Success(bookDetailed.toBook())
+    override suspend fun getFilledBook(
+        title: String,
+        author: Pair<String, String>,
+        reader: Pair<String, String>
+    ): Resource<Book>{
+        val bookEntity=DB.bookDao().getBook(title,author,reader)
+        if (bookEntity != null) {
+            if (bookEntity.isDetailed()){
+                return Resource.Success(bookEntity.toBook())
             }else{
-                val bookDetailed=knigaVUheParser.getBookDetailed(book)
+                val bookDetailed=knigaVUheParser.getFilledBook(bookEntity.toBook())
                 DB.bookDao().insert(listOf(bookDetailed.toBookEntity()))
                 return Resource.Success(bookDetailed)
             }

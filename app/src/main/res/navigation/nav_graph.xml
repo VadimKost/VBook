@@ -24,10 +24,16 @@
             android:name="title"
             app:argType="string" />
         <argument
+            android:name="author"
+            app:argType="string" />
+        <argument
             android:name="authorURL"
             app:argType="string" />
         <argument
-            android:name="author"
+            android:name="reader"
+            app:argType="string" />
+        <argument
+            android:name="readerURL"
             app:argType="string" />
     </fragment>
 </navigation>

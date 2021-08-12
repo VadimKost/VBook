@@ -17,7 +17,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         return parseBookList("new/?page=$page")
     }
 
-    override fun getBookDetailed(book: Book): Book {
+    override fun getFilledBook(book: Book): Book {
         Log.e("getBookDetailedPar",book.toString())
         val url=base_url+book.bookURL
         var jsonMp3=""

@@ -48,7 +48,10 @@ class BookDetailedFragment : Fragment() {
         binding= FragmentBookDetailedBinding.inflate(inflater,container,false)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            vm.getBookDetailed(args.title,args.authorURL to args.author)
+            vm.setCurrentBook(
+                args.title,
+                args.author to args.authorURL ,
+                args.reader to args.readerURL)
             withContext(Dispatchers.Main){
                 vm.actions.collect{
                     when(it){

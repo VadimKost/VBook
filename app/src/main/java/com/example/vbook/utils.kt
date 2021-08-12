@@ -22,5 +22,3 @@ fun Book.isDetailed():Boolean{
 fun BookEntity.isDetailed():Boolean{
     return mp3List != null
 }
-
-

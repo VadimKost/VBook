@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.vbook.domain.model.Book
 import com.example.vbook.databinding.BookItemBinding
 
-class BookSetAdapterRV(var books: MutableList<Book>,val onItemClicked:(String,String,String)->Unit): RecyclerView.Adapter<BookSetAdapterRV.LinkHolder>() {
+class BookSetAdapterRV(var books: MutableList<Book>,val onItemClicked:(String,Pair<String,String>,Pair<String,String>)->Unit): RecyclerView.Adapter<BookSetAdapterRV.LinkHolder>() {
     inner class LinkHolder(val binding: BookItemBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int){
             val book = books.get(position)
@@ -15,7 +15,7 @@ class BookSetAdapterRV(var books: MutableList<Book>,val onItemClicked:(String,St
             binding.book=book
             binding.executePendingBindings()
             binding.root.setOnClickListener{
-                onItemClicked(book.title,book.author.first,book.author.second)
+                onItemClicked(book.title,book.author,book.reader)
             }
         }
 

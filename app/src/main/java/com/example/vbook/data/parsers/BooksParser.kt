@@ -8,7 +8,7 @@ abstract class BooksParser {
 
     abstract fun getAllNewBooks(page:Int):List<Book>
 
-    abstract fun getBookDetailed(book: Book):Book
+    abstract fun getFilledBook(book: Book):Book
 
     abstract fun search(text:String,page: Int):List<Book>
 
