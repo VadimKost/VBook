@@ -1,21 +1,23 @@
 package com.example.vbook.presentation.bookdetailed
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.vbook.domain.common.Action
+import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
-import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.usecases.GetFilledBook
-import com.example.vbook.domain.usecases.MakeBookCurrent
+import com.example.vbook.presentation.mediaservice.MediaService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class BookDetailedVM @Inject constructor(
-    private val fillBook: GetFilledBook,
-    private val makeBookCurrent: MakeBookCurrent,
     private val getFilledBook: GetFilledBook
 ): ViewModel() {
 
@@ -23,17 +25,23 @@ class BookDetailedVM @Inject constructor(
         MutableStateFlow(Action.idle())
     val actions: StateFlow<Action> =_actions
 
-    private val _book: MutableStateFlow<Book?> = MutableStateFlow(null)
-    val  book: StateFlow<Book?> =_book
-
-    suspend fun setCurrentBook(title:String, author:Pair<String,String>, reader:Pair<String,String>){
-        val bookResource = getFilledBook(title, author, reader)
-        when(bookResource){
-            is Resource.Success -> {
-                makeBookCurrent(bookResource.data)
+    fun setServiceBook(service:MediaService,title:String,author:Pair<String,String>,reader:Pair<String,String>){
+        viewModelScope.launch(IO) {
+            val book = when(val bookResource = getFilledBook(title, author, reader)){
+                is Result.Success-> {
+                    bookResource.data
+                }
+                is Result.Error -> {
+                    _actions.value=Action.showToast(bookResource.message)
+                    null
+                }
             }
-            is Resource.Error -> {
-                _actions.value=Action.showToast(bookResource.message)
+
+            if (book != null) {
+                withContext(Main){
+                    service.setCurrentBook(book)
+                }
+
             }
         }
     }

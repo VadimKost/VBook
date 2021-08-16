@@ -5,7 +5,7 @@ import com.example.vbook.data.mapper.toBook
 import com.example.vbook.data.mapper.toBookEntity
 import com.example.vbook.data.mapper.toBookEntityList
 import com.example.vbook.data.parsers.KnigaVUheParser
-import com.example.vbook.domain.common.Resource
+import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.repository.BookRepository
 import com.example.vbook.isDetailed
@@ -19,51 +19,38 @@ class BookRepositoryImpl @Inject constructor(
     val knigaVUheParser: KnigaVUheParser
 ): BookRepository {
 
-    override suspend fun fetchNewBooks(page:Int): Resource<List<Book>> {
+    override suspend fun fetchNewBooks(page:Int): Result<List<Book>> {
         val books=knigaVUheParser.getAllNewBooks(page)
         val booksEntity = books.toBookEntityList()
         DB.bookDao().insert(booksEntity)
-        return Resource.Success(books)
-    }
-
-    override suspend fun getBook(
-        title: String,
-        author: Pair<String, String>,
-        reader: Pair<String, String>
-    ):Resource<Book>{
-        val bookEntity= DB.bookDao().getBook(title, author, reader)
-        if (bookEntity !=null){
-            return Resource.Success(bookEntity.toBook())
-        }else{
-            return Resource.Error("Empty Book")
-        }
+        return Result.Success(books)
     }
 
     override suspend fun getFilledBook(
         title: String,
         author: Pair<String, String>,
         reader: Pair<String, String>
-    ): Resource<Book>{
+    ): Result<Book> {
         val bookEntity=DB.bookDao().getBook(title,author,reader)
         if (bookEntity != null) {
             if (bookEntity.isDetailed()){
-                return Resource.Success(bookEntity.toBook())
+                return Result.Success(bookEntity.toBook())
             }else{
                 val bookDetailed=knigaVUheParser.getFilledBook(bookEntity.toBook())
                 DB.bookDao().insert(listOf(bookDetailed.toBookEntity()))
-                return Resource.Success(bookDetailed)
+                return Result.Success(bookDetailed)
             }
         }else{
-            return Resource.Error("Empty Book")
+            return Result.Error("Empty Book")
         }
     }
 
-    override suspend fun getCurrentBook(): Resource<Book> {
+    override suspend fun getCurrentBook(): Result<Book> {
         val bookEntity = DB.bookDao().getCurrentBook()
         if (bookEntity != null){
-            return Resource.Success(bookEntity.toBook())
+            return Result.Success(bookEntity.toBook())
         }else{
-            return Resource.Error("NoCurrentBook")
+            return Result.Error("NoCurrentBook")
         }
     }
 

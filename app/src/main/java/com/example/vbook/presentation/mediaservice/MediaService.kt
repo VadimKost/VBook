@@ -9,48 +9,66 @@ import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.example.vbook.domain.common.Resource
 import com.example.vbook.domain.model.Book
-import com.example.vbook.domain.usecases.GetCurrentBook
 import com.example.vbook.domain.usecases.UpdateBook
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MediaService: Service() {
-    lateinit var notificationManager: NotificationManager
-    private var currentBook: Book? = null
-    private var isForegroundService = false
-    @Inject
-    lateinit var getCurrentBook: GetCurrentBook
-    @Inject
-    lateinit var updateBook: UpdateBook
 
     @Inject
     lateinit var player: SimpleExoPlayer
+
+    private var _currentBook:MutableStateFlow<Book?> = MutableStateFlow(null)
+    var currentBook = _currentBook.asStateFlow()
+
+    val trackIndex= flow {
+        while (true){
+            val book=currentBook.value
+            if (book != null){
+                emit(book.stoppedTrackIndex)
+            }
+            delay(1000L)
+        }
+    }
+
+    val trackTime = flow{
+        while (true){
+            val book=currentBook.value
+            if (book != null){
+                emit(book.stoppedTrackTime)
+            }
+
+            delay(1000L)
+        }
+    }
+
+    private lateinit var notificationManager: NotificationManager
+    private var isForegroundService = false
+
+    @Inject
+    lateinit var updateBook: UpdateBook
     
     private lateinit var mediaSessionConnector: MediaSessionConnector
-    lateinit var mediaSession: MediaSessionCompat
+    private lateinit var mediaSession: MediaSessionCompat
 
-    suspend fun updateCurrentBook(){
-        val bookResource=getCurrentBook()
-        val book = if (bookResource is Resource.Success) bookResource.data else null
-        if (book != currentBook){
-            currentBook=book
-            preparePlayList(currentBook!!)
+    fun setCurrentBook(book: Book){
+        if (book != currentBook.value){
+            _currentBook.value=book
+            preparePlayList(currentBook.value!!)
         }
-
     }
     override fun onCreate() {
         super.onCreate()
-        runBlocking {
-            updateCurrentBook()
-        }
+
         player.addListener(PlayerEventListener())
         val sessionActivityPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
@@ -70,6 +88,7 @@ class MediaService: Service() {
             mediaSession.sessionToken,
             PlayerNotificationListener()
         )
+        notificationManager.showNotificationForPlayer(player)
     }
 
 
@@ -98,10 +117,11 @@ class MediaService: Service() {
         player.prepare()
         player.seekTo(initialWindowIndex, playbackStartPositionMs)
     }
+
     fun getMediaDataFromBook(trackNumber: Int):MediaMetadata{
         return MediaMetadata.Builder()
-            .setTitle(currentBook?.title)
-            .setArtist(currentBook?.author?.first)
+            .setTitle(currentBook.value?.title)
+            .setArtist(currentBook.value?.author?.first)
             .setTrackNumber(trackNumber)
             .build()
     }
@@ -109,7 +129,7 @@ class MediaService: Service() {
 
 
     inner class PlayerServiceBinder : Binder() {
-        val mediaSessionToken: MediaSessionCompat.Token = mediaSession.sessionToken
+        val service = this@MediaService
     }
     override fun onBind(intent: Intent): IBinder {
         return PlayerServiceBinder()
@@ -122,14 +142,13 @@ class MediaService: Service() {
                 stopForeground(false)
                 isForegroundService = false
                 runBlocking{
-                    currentBook!!.stoppedTrackIndex= player.currentWindowIndex
-                    currentBook!!.stoppedTrackTime= player.contentPosition
-                    updateBook(currentBook!!)
+                    currentBook.value!!.stoppedTrackIndex= player.currentWindowIndex
+                    currentBook.value!!.stoppedTrackTime= player.contentPosition
+                    updateBook(currentBook.value!!)
+                    _currentBook.value = _currentBook.value?.copy()
                 }
             }else{
                 Log.e("v","play")
-                runBlocking { updateCurrentBook()}
-                notificationManager.showNotificationForPlayer(player)
             }
         }
 

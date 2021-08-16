@@ -2,7 +2,7 @@ package com.example.vbook.presentation.bookslist
 
 import androidx.lifecycle.ViewModel
 import com.example.vbook.domain.common.Action
-import com.example.vbook.domain.common.Resource
+import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.usecases.GetPartOfNewBooks
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,14 +22,14 @@ class BooksListVM @Inject constructor(
     val  actions:StateFlow<Action> =_actions
 
     suspend fun loadMoreNewBooks(){
-        val books= getPartOfNewBooks.invoke(page)
+        val books= getPartOfNewBooks(page)
             when(books){
-                is Resource.Success -> {
+                is Result.Success -> {
                     page+=1
                     bookList.addAll(books.data)
                     _actions.value = Action.updateRV()
                 }
-                is Resource.Error -> _actions.value=Action.showToast(books.message)
+                is Result.Error -> _actions.value=Action.showToast(books.message)
             }
         }
     }

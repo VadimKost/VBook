@@ -1,16 +1,20 @@
 package com.example.vbook
 
 import android.util.Log
+import androidx.lifecycle.LifecycleCoroutineScope
 import com.example.vbook.data.db.model.BookEntity
-import com.example.vbook.domain.common.Resource
+import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
 
-fun <T>ThrowableResource(e:Throwable, tag:String="defError"):Resource<T>{
-    Log.e(tag, e.stackTraceToString())
+fun ThrowableResult(e:Throwable, tag:String="defError"): Result.Error {
+    Log.e("UseCase $tag", e.stackTraceToString())
     return when(e){
-        is IllegalStateException -> Resource.Error(e.message+" Error")
-        else -> Resource.Error("Other Shit")
+        is IllegalStateException -> Result.Error(e.message+" Error")
+        else -> Result.Error("Other Shit From ThrowableResult")
     }
 }
 
@@ -22,3 +26,4 @@ fun Book.isDetailed():Boolean{
 fun BookEntity.isDetailed():Boolean{
     return mp3List != null
 }
+

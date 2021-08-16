@@ -1,7 +1,7 @@
 package com.example.vbook.domain.usecases
 
-import com.example.vbook.ThrowableResource
-import com.example.vbook.domain.common.Resource
+import com.example.vbook.ThrowableResult
+import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.repository.BookRepository
 import javax.inject.Inject
@@ -16,11 +16,11 @@ class GetFilledBook @Inject constructor(
         title: String,
         author: Pair<String, String>,
         reader: Pair<String, String>
-    ): Resource<Book> {
+    ): Result<Book> {
         return try {
             bookRepository.getFilledBook(title, author, reader)
         }catch (e:Throwable){
-            ThrowableResource(e,"GetBookDetailed")
+            ThrowableResult(e,"GetBookDetailed")
         }
     }
 }
