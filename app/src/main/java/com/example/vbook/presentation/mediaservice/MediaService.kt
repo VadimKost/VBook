@@ -44,6 +44,10 @@ class MediaService: Service() {
             delay(1000L)
         }
     }
+    val _isPlaying= MutableStateFlow(false)
+    val isPlaying= _isPlaying.asStateFlow()
+
+
 
     private lateinit var notificationManager: NotificationManager
     private var isForegroundService = false
@@ -130,24 +134,27 @@ class MediaService: Service() {
     private inner class PlayerEventListener : Player.Listener {
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            updatePlayBackPosition()
+            updateBookPlayBackMetaData(isPlaying.value)
         }
 
         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
             if (!playWhenReady){
                 stopForeground(false)
                 isForegroundService = false
-                updatePlayBackPosition()
+                updateBookPlayBackMetaData(false)
+            }else{
+                updateBookPlayBackMetaData(true)
             }
         }
     }
 
-    fun updatePlayBackPosition(){
+    fun updateBookPlayBackMetaData(isPlaying:Boolean){
         scope.launch{
             withContext(Main){
                 currentBook!!.stoppedTrackIndex= player.currentWindowIndex
                 currentBook!!.stoppedTrackTime= player.contentPosition
             }
+            _isPlaying.value = isPlaying
             updateBook(currentBook!!)
         }
     }
