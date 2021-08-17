@@ -8,8 +8,10 @@ import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.usecases.GetFilledBook
 import com.example.vbook.presentation.mediaservice.MediaService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -25,8 +27,8 @@ class BookDetailedVM @Inject constructor(
         MutableStateFlow(Action.idle())
     val actions: StateFlow<Action> =_actions
 
-    fun setServiceBook(service:MediaService,title:String,author:Pair<String,String>,reader:Pair<String,String>){
-        viewModelScope.launch(IO) {
+    fun setServiceBook(service:MediaService,title:String,author:Pair<String,String>,reader:Pair<String,String>): Deferred<Book?> {
+        return viewModelScope.async(IO) {
             val book = when(val bookResource = getFilledBook(title, author, reader)){
                 is Result.Success-> {
                     bookResource.data
@@ -36,13 +38,12 @@ class BookDetailedVM @Inject constructor(
                     null
                 }
             }
-
             if (book != null) {
                 withContext(Main){
-                    service.setCurrentBook(book)
+                    service.makeBookCurrent(book)
                 }
-
             }
+            return@async book
         }
     }
 }

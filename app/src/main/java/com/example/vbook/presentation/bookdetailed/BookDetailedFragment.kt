@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collect
 import com.example.vbook.presentation.mediaservice.MediaService
 import com.example.vbook.domain.common.Action
-import com.example.vbook.domain.model.Book
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -51,25 +50,22 @@ class BookDetailedFragment : Fragment() {
                 playerServiceBinder = service as MediaService.PlayerServiceBinder
                 val service = playerServiceBinder!!.service
 
-                vm.setServiceBook(
-                    service,
-                    args.title,
-                    args.author to args.authorURL,
-                    args.reader to args.readerURL
-                )
-                setPlayerControlling(service)
                 lifecycleScope.launch {
-                    service.currentBook.collect {
-                        if (it != null){
-                            binding.titleD.text=it.title
+                    val book= vm.setServiceBook(
+                        service,
+                        args.title,
+                        args.author to args.authorURL,
+                        args.reader to args.readerURL
+                    ).await()
+
+                    lifecycleScope.launch {
+                        service.trackIndex.collect {
+                            binding.indexD.text=it.toString()
                         }
                     }
+
                 }
-                lifecycleScope.launch {
-                    service.trackIndex.collect {
-                        binding.indexD.text=it.toString()
-                    }
-                }
+                setPlayerControlling(service)
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {

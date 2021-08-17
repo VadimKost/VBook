@@ -15,38 +15,32 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MediaService: Service() {
+    val scope = CoroutineScope(IO)
 
     @Inject
     lateinit var player: SimpleExoPlayer
 
-    private var _currentBook:MutableStateFlow<Book?> = MutableStateFlow(null)
-    var currentBook = _currentBook.asStateFlow()
+    var currentBook:Book? = null
 
     val trackIndex= flow {
         while (true){
-            val book=currentBook.value
-            if (book != null){
-                emit(book.stoppedTrackIndex)
-            }
+            emit(player.currentWindowIndex)
             delay(1000L)
         }
     }
 
     val trackTime = flow{
         while (true){
-            val book=currentBook.value
-            if (book != null){
-                emit(book.stoppedTrackTime)
-            }
-
+            emit(player.currentPosition)
             delay(1000L)
         }
     }
@@ -60,15 +54,14 @@ class MediaService: Service() {
     private lateinit var mediaSessionConnector: MediaSessionConnector
     private lateinit var mediaSession: MediaSessionCompat
 
-    fun setCurrentBook(book: Book){
-        if (book != currentBook.value){
-            _currentBook.value=book
-            preparePlayList(currentBook.value!!)
+    fun makeBookCurrent(book: Book){
+        if (book != currentBook){
+            currentBook=book
+            preparePlayList(currentBook!!)
         }
     }
     override fun onCreate() {
         super.onCreate()
-
         player.addListener(PlayerEventListener())
         val sessionActivityPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
@@ -94,9 +87,9 @@ class MediaService: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.e("des","des")
         mediaSession.release()
         player.release()
+        scope.cancel()
     }
 
     private fun preparePlayList(book: Book) {
@@ -120,8 +113,8 @@ class MediaService: Service() {
 
     fun getMediaDataFromBook(trackNumber: Int):MediaMetadata{
         return MediaMetadata.Builder()
-            .setTitle(currentBook.value?.title)
-            .setArtist(currentBook.value?.author?.first)
+            .setTitle(currentBook?.title)
+            .setArtist(currentBook?.author?.first)
             .setTrackNumber(trackNumber)
             .build()
     }
@@ -136,24 +129,27 @@ class MediaService: Service() {
     }
     private inner class PlayerEventListener : Player.Listener {
 
-        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-            if (!playWhenReady){
-                Log.e("v","stop")
-                stopForeground(false)
-                isForegroundService = false
-                runBlocking{
-                    currentBook.value!!.stoppedTrackIndex= player.currentWindowIndex
-                    currentBook.value!!.stoppedTrackTime= player.contentPosition
-                    updateBook(currentBook.value!!)
-                    _currentBook.value = _currentBook.value?.copy()
-                }
-            }else{
-                Log.e("v","play")
-            }
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            updatePlayBackPosition()
         }
 
+        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+            if (!playWhenReady){
+                stopForeground(false)
+                isForegroundService = false
+                updatePlayBackPosition()
+            }
+        }
+    }
 
-
+    fun updatePlayBackPosition(){
+        scope.launch{
+            withContext(Main){
+                currentBook!!.stoppedTrackIndex= player.currentWindowIndex
+                currentBook!!.stoppedTrackTime= player.contentPosition
+            }
+            updateBook(currentBook!!)
+        }
     }
 
     inner class PlayerNotificationListener :
