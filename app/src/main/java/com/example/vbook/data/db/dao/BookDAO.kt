@@ -17,8 +17,8 @@ interface BookDAO{
     @Query("SELECT * FROM BookEntity WHERE isCurrent=1")
     suspend fun getCurrentBook(): BookEntity?
 
-    @Query("SELECT * FROM BookEntity WHERE title=:title AND author=:author AND reader=:reader ")
-    suspend fun getBook(title:String,author:Pair<String,String>,reader:Pair<String,String>): BookEntity?
+    @Query("SELECT * FROM BookEntity WHERE bookURL=:bookUrl")
+    suspend fun getBook(bookUrl:String): BookEntity?
 
     @Update
     suspend fun updateBook(book: BookEntity):Int

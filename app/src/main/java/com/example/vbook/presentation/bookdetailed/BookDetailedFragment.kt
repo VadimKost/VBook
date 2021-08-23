@@ -56,9 +56,7 @@ class BookDetailedFragment : Fragment() {
                 lifecycleScope.launch {
                     val book= vm.setServiceBook(
                         service,
-                        args.title,
-                        args.author to args.authorURL,
-                        args.reader to args.readerURL
+                        args.bookUrl
                     ).await()
                     if (book != null) {
                         activity.supportActionBar?.title =book.title

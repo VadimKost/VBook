@@ -13,12 +13,10 @@ class GetFilledBook @Inject constructor(
     val bookRepository: BookRepository
 ) {
     suspend operator fun invoke(
-        title: String,
-        author: Pair<String, String>,
-        reader: Pair<String, String>
+        bookUrl: String,
     ): Result<Book> {
         return try {
-            bookRepository.getFilledBook(title, author, reader)
+            bookRepository.getFilledBook(bookUrl)
         }catch (e:Throwable){
             ThrowableResult(e,"GetBookDetailed")
         }

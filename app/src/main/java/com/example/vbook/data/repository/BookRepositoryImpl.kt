@@ -27,11 +27,9 @@ class BookRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getFilledBook(
-        title: String,
-        author: Pair<String, String>,
-        reader: Pair<String, String>
+        bookUrl: String,
     ): Result<Book> {
-        val bookEntity=DB.bookDao().getBook(title,author,reader)
+        val bookEntity=DB.bookDao().getBook(bookUrl)
         if (bookEntity != null) {
             if (bookEntity.isDetailed()){
                 return Result.Success(bookEntity.toBook())

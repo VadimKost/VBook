@@ -21,19 +21,7 @@
         android:label="fragment_book_detailed"
         tools:layout="@layout/fragment_book_detailed" >
         <argument
-            android:name="title"
-            app:argType="string" />
-        <argument
-            android:name="author"
-            app:argType="string" />
-        <argument
-            android:name="authorURL"
-            app:argType="string" />
-        <argument
-            android:name="reader"
-            app:argType="string" />
-        <argument
-            android:name="readerURL"
+            android:name="bookUrl"
             app:argType="string" />
     </fragment>
 </navigation>

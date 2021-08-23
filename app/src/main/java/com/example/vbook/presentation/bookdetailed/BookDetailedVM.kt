@@ -27,9 +27,9 @@ class BookDetailedVM @Inject constructor(
         MutableStateFlow(Action.idle())
     val actions: StateFlow<Action> =_actions
 
-    fun setServiceBook(service:MediaService,title:String,author:Pair<String,String>,reader:Pair<String,String>): Deferred<Book?> {
+    fun setServiceBook(service:MediaService,bookUrl:String): Deferred<Book?> {
         return viewModelScope.async(IO) {
-            val book = when(val bookResource = getFilledBook(title, author, reader)){
+            val book = when(val bookResource = getFilledBook(bookUrl)){
                 is Result.Success-> {
                     bookResource.data
                 }

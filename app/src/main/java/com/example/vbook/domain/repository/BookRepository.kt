@@ -11,8 +11,6 @@ interface BookRepository {
     suspend fun updateBook(book: Book):Boolean
 
     suspend fun getFilledBook(
-        title: String,
-        author: Pair<String, String>,
-        reader: Pair<String, String>
+        bookUrl: String,
     ): Result<Book>
 }
