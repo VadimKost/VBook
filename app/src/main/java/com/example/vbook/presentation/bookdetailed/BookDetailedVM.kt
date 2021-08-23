@@ -2,7 +2,6 @@ package com.example.vbook.presentation.bookdetailed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vbook.domain.common.Action
 import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.usecases.GetFilledBook
@@ -14,7 +13,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -23,9 +21,6 @@ class BookDetailedVM @Inject constructor(
     private val getFilledBook: GetFilledBook
 ): ViewModel() {
 
-    private val _actions: MutableStateFlow<Action> =
-        MutableStateFlow(Action.idle())
-    val actions: StateFlow<Action> =_actions
 
     fun setServiceBook(service:MediaService,bookUrl:String): Deferred<Book?> {
         return viewModelScope.async(IO) {
@@ -34,7 +29,6 @@ class BookDetailedVM @Inject constructor(
                     bookResource.data
                 }
                 is Result.Error -> {
-                    _actions.value=Action.showToast(bookResource.message)
                     null
                 }
             }
