@@ -1,5 +1,6 @@
 package com.example.vbook.presentation.bookslist
 
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -10,27 +11,40 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.example.vbook.domain.model.Book
 import com.example.vbook.presentation.common.UiState
 import com.example.vbook.presentation.common.components.StateSection
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.delay
 
 @Composable
 fun NewBooksScreen(
     vm:BooksListVM
 ) {
-    NewBooksBody(
-        booksState = vm.booksState.value,
-        onAddMore = vm::loadMoreNewBooks
-    )
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = vm.isRefreshing.value),
+        onRefresh = { vm.refresh() },
+    ){
+        NewBooksBody(
+            booksState = vm.booksState.collectAsState().value,
+            onAddMore = vm::loadMoreNewBooks
+        )
+    }
+
 }
 @Composable
 fun NewBooksBody(

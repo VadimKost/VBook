@@ -1,8 +1,11 @@
 package com.example.vbook.presentation.common.components
 
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -15,14 +18,13 @@ import com.example.vbook.presentation.common.UiState
 fun <T> StateSection(
     state: UiState<T>,
     modifier:Modifier=Modifier,
-    errorMessage: String = "Oops! Something went wrong, Please try again after some time",
-    emptyMessage: String = "Nothing in here Yet!, Please comeback later",
     content: @Composable (T) -> Unit)
 {
     when (state) {
         is UiState.Loading -> {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -31,7 +33,16 @@ fun <T> StateSection(
 
         }
         is UiState.Error -> {
-            Text( text = errorMessage)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text( text = state.message)
+            }
+
         }
         is UiState.Empty -> {
 
