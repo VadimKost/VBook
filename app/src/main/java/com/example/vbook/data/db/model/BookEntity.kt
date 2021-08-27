@@ -6,10 +6,11 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.example.vbook.domain.model.Book
 
-@Entity(tableName = "BookEntity",primaryKeys = ["title", "author"])
+@Entity(tableName = "BookEntity")
 @TypeConverters(TypeConvertor::class)
 data class BookEntity(
     @ColumnInfo(name = "source") var source:String,
+    @PrimaryKey
     @ColumnInfo(name = "bookURL") var bookURL:String,
     @ColumnInfo(name = "title") var title:String,
     @ColumnInfo(name = "author") var author:Pair<String,String>,

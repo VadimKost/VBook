@@ -1,6 +1,5 @@
-package com.example.vbook.presentation.bookslist
+package com.example.vbook.presentation.newbooks
 
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -13,43 +12,48 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.vbook.domain.model.Book
+import com.example.vbook.presentation.VBookScreen
+import com.example.vbook.presentation.addArgs
 import com.example.vbook.presentation.common.UiState
 import com.example.vbook.presentation.common.components.StateSection
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.delay
 
 @Composable
 fun NewBooksScreen(
-    vm:BooksListVM
+    vm:NewBooksVM,
+    navController: NavController
 ) {
+    val isRefreshing =vm.isRefreshing.collectAsState()
+    val swipeEnabled =vm.canBeRefreshed.collectAsState()
+
     SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = vm.isRefreshing.value),
-        onRefresh = { vm.refresh() },
+        state = rememberSwipeRefreshState(isRefreshing = isRefreshing.value),
+        onRefresh = vm::refresh,
+        swipeEnabled = swipeEnabled.value
     ){
         NewBooksBody(
             booksState = vm.booksState.collectAsState().value,
+            onItemClick = { bookUrl ->
+                navController.navigate(VBookScreen.BookDetailed.name.addArgs("bookUrl",bookUrl))
+            },
             onAddMore = vm::loadMoreNewBooks
         )
     }
 
 }
+
 @Composable
 fun NewBooksBody(
     booksState: UiState<List<Book>>,
-    onItemClick: () -> Unit ={},
+    onItemClick: (String) -> Unit ={},
     onAddMore: () -> Unit ={}
 ) {
     StateSection(state = booksState) { books ->
@@ -63,9 +67,9 @@ fun NewBooksBody(
                         .fillMaxWidth()
                         .height(150.dp)
                         .padding(5.dp)
-                        .clickable(onClick = onItemClick)
+                        .clickable(onClick = { onItemClick(book.bookURL) })
                 ) {
-                    Row() {
+                    Row {
                         Image(
                             painter = rememberImagePainter(
                                 data=book.coverURL,
@@ -79,21 +83,21 @@ fun NewBooksBody(
                                 .padding(5.dp)
                                 .size(140.dp)
                         )
-                        Column() {
+                        Column {
                             Text(
                                 text =book.title,
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 textAlign = TextAlign.Center
                             )
-                            Row() {
+                            Row {
                                 Icon(imageVector = Icons.Filled.Person, contentDescription = null)
                                 Text(
                                     text = book.author.first,
                                     style = MaterialTheme.typography.body2,
                                 )
                             }
-                            Row() {
+                            Row {
                                 Icon(imageVector = Icons.Filled.Mic, contentDescription = null)
                                 Text(
                                     text = book.reader.first,

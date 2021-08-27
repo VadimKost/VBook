@@ -9,11 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
-import com.example.vbook.presentation.bookslist.BooksListVM
-import com.example.vbook.presentation.bookslist.NewBooksScreen
+import com.example.vbook.presentation.bookdetailed.BookDetailedScreen
+import com.example.vbook.presentation.bookdetailed.BookDetailedVM
+import com.example.vbook.presentation.newbooks.NewBooksVM
+import com.example.vbook.presentation.newbooks.NewBooksScreen
 import com.example.vbook.presentation.theme.VBookTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,8 +37,7 @@ class MainActivity : AppCompatActivity() {
 fun VBookApp(){
     VBookTheme {
         val navController = rememberNavController()
-        Scaffold(
-        ) {innerPadding ->
+        Scaffold { innerPadding ->
             VBookNavHost(
                 navController = navController,
                 modifier = Modifier.padding(innerPadding)
@@ -50,12 +53,24 @@ fun VBookNavHost(
     modifier: Modifier = Modifier) {
     NavHost(
         navController = navController,
-        startDestination = VBookScreen.Search.name,
+        startDestination = VBookScreen.NewBooks.name,
         modifier = modifier
     ) {
-        composable(VBookScreen.Search.name){
-            val vm = hiltViewModel<BooksListVM>()
-            NewBooksScreen(vm)
+        composable(VBookScreen.NewBooks.name){
+            val vm = hiltViewModel<NewBooksVM>()
+            NewBooksScreen(vm, navController)
+        }
+        composable(
+            VBookScreen.BookDetailed.name.addPathArgs("bookUrl"),
+            arguments = listOf(navArgument("bookUrl") {
+                type = NavType.StringType
+                nullable=true
+            })
+        ){
+            val vm = hiltViewModel<BookDetailedVM>()
+            val bookUrl = it.arguments?.getString("bookUrl")
+            vm.setServiceBook(bookUrl!!)
+            BookDetailedScreen(vm, navController)
         }
     }
 }

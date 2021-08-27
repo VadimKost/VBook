@@ -34,8 +34,9 @@ class BookRepositoryImpl @Inject constructor(
             if (bookEntity.isDetailed()){
                 return Result.Success(bookEntity.toBook())
             }else{
-                val bookDetailed=knigaVUheParser.getFilledBook(bookEntity.toBook())
-                DB.bookDao().insert(listOf(bookDetailed.toBookEntity()))
+                val book = bookEntity.toBook()
+                val bookDetailed=knigaVUheParser.getFilledBook(book)
+                updateBook(book)
                 return Result.Success(bookDetailed)
             }
         }else{

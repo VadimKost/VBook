@@ -11,7 +11,10 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.usecases.UpdateBook
+import com.example.vbook.getStateData
+import com.example.vbook.presentation.common.UiState
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,14 +32,16 @@ class MediaService: Service() {
     @Inject
     lateinit var player: SimpleExoPlayer
 
-    var currentBook:Book? = null
+    private val _bookState = MutableStateFlow<UiState<Book>>(UiState.Loading)
+    val booksState =_bookState.asStateFlow()
 
-    val trackIndex= flow {
-        while (true){
-            emit(player.currentWindowIndex)
-            delay(1000L)
-        }
-    }
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
+    private val _hasNext = MutableStateFlow(false)
+    val hasNext = _hasNext.asStateFlow()
+
+    val trackIndex= MutableStateFlow(0)
 
     val trackTime = flow{
         while (true){
@@ -44,10 +49,6 @@ class MediaService: Service() {
             delay(1000L)
         }
     }
-    val _isPlaying= MutableStateFlow(false)
-    val isPlaying= _isPlaying.asStateFlow()
-
-
 
     private lateinit var notificationManager: NotificationManager
     private var isForegroundService = false
@@ -58,14 +59,21 @@ class MediaService: Service() {
     private lateinit var mediaSessionConnector: MediaSessionConnector
     private lateinit var mediaSession: MediaSessionCompat
 
-    fun makeBookCurrent(book: Book){
-        if (book != currentBook){
-            currentBook=book
-            preparePlayList(currentBook!!)
+    fun setBook(book: Book){
+        val stateBook = getStateData(_bookState.value)
+        if (stateBook != book){
+            preparePlayList(book)
+            _bookState.value =UiState.Success(book)
         }
+
     }
+    fun onError(message:String){
+        _bookState.value = UiState.Error(message)
+    }
+
     override fun onCreate() {
         super.onCreate()
+        player.prepare()
         player.addListener(PlayerEventListener())
         val sessionActivityPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
@@ -88,42 +96,41 @@ class MediaService: Service() {
         notificationManager.showNotificationForPlayer(player)
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
+        savePlayListMeta(getStateData(_bookState.value),player.currentWindowIndex,player.contentPosition)
         mediaSession.release()
         player.release()
         scope.cancel()
     }
 
     private fun preparePlayList(book: Book) {
-        player.clearMediaItems()
+        val old =getStateData(_bookState.value)
+        if (old != null){
+            savePlayListMeta(old,player.currentWindowIndex,player.contentPosition)
+            Log.d("BookProbable","${old.title} i= ${player.currentWindowIndex} t = ${player.contentPosition}")
+        }
 
+        player.clearMediaItems()
         val initialWindowIndex = book.stoppedTrackIndex
-        val playbackStartPositionMs=book.stoppedTrackTime
-        Log.e("vas","i=${initialWindowIndex} and ms=${playbackStartPositionMs}")
+        val playbackStartPositionMs = book.stoppedTrackTime
 
         book.mp3List!!.forEachIndexed { index, track ->
             player.addMediaItem(MediaItem.Builder()
                 .setUri(track.second)
-                .setMediaMetadata(getMediaDataFromBook(index))
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setTitle(book.title)
+                        .setArtist(book.author.first)
+                        .setTrackNumber(index)
+                        .build()
+                )
                 .build()
             )
         }
-
-        player.prepare()
         player.seekTo(initialWindowIndex, playbackStartPositionMs)
+        updatePlayBackMeta()
     }
-
-    fun getMediaDataFromBook(trackNumber: Int):MediaMetadata{
-        return MediaMetadata.Builder()
-            .setTitle(currentBook?.title)
-            .setArtist(currentBook?.author?.first)
-            .setTrackNumber(trackNumber)
-            .build()
-    }
-
-
 
     inner class PlayerServiceBinder : Binder() {
         val service = this@MediaService
@@ -134,29 +141,41 @@ class MediaService: Service() {
     private inner class PlayerEventListener : Player.Listener {
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            updateBookPlayBackMetaData(isPlaying.value)
+            updatePlayBackMeta()
         }
 
         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
             if (!playWhenReady){
                 stopForeground(false)
                 isForegroundService = false
-                updateBookPlayBackMetaData(false)
+                updatePlayBackMeta()
+                Log.d("Book","stop")
+                savePlayListMeta(getStateData(_bookState.value),player.currentWindowIndex,player.contentPosition)
             }else{
-                updateBookPlayBackMetaData(true)
+                updatePlayBackMeta()
             }
         }
     }
-
-    fun updateBookPlayBackMetaData(isPlaying:Boolean){
-        scope.launch{
-            withContext(Main){
-                currentBook!!.stoppedTrackIndex= player.currentWindowIndex
-                currentBook!!.stoppedTrackTime= player.contentPosition
+    fun savePlayListMeta(book: Book?,trackIndex:Int,trackTime: Long){
+        scope.launch {
+            if (book != null){
+                withContext(Main){
+                    Log.d("BookSet","${book.title} i= $trackIndex t = ${player.contentPosition}")
+                    book.stoppedTrackIndex= trackIndex
+                    book.stoppedTrackTime= trackTime
+                }
+                withContext(IO){
+                    updateBook(book)
+                }
             }
-            _isPlaying.value = isPlaying
-            updateBook(currentBook!!)
         }
+
+    }
+
+    fun updatePlayBackMeta(){
+        trackIndex.value = player.currentWindowIndex
+        _isPlaying.value = player.playWhenReady
+        _hasNext.value = player.hasNextWindow()
     }
 
     inner class PlayerNotificationListener :

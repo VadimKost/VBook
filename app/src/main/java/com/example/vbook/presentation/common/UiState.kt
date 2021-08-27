@@ -4,5 +4,5 @@ sealed class UiState<out T> {
     object Loading:UiState<Nothing>()
     class Error(val message:String):UiState<Nothing>()
     object Empty:UiState<Nothing>()
-    class Data<T>(var data:T): UiState<T>()
+    class Success<T>(var data:T): UiState<T>()
 }

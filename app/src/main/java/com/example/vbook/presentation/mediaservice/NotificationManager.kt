@@ -45,7 +45,6 @@ class NotificationManager(
             controller.sessionActivity
 
         override fun getCurrentContentText(player: Player): CharSequence {
-            Log.e("player",player.currentMediaItem?.mediaMetadata?.title.toString())
             return player.currentMediaItem?.mediaMetadata?.artist.toString()
         }
 

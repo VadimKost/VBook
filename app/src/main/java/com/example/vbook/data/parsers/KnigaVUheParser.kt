@@ -18,7 +18,6 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
     }
 
     override fun getFilledBook(book: Book): Book {
-        Log.e("getBookDetailedPar",book.toString())
         val url=base_url+book.bookURL
         var jsonMp3=""
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
@@ -33,7 +32,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         }
         jsonMp3=jsonMp3.split("]")[0]+"]"
         val gson = GsonBuilder()
-            .create();
+            .create()
         val itemsListType = object : TypeToken<List<BookMedia>>() {}.type
         val list=gson.fromJson<List<BookMedia>>(jsonMp3,itemsListType)
         val mp3List= mutableListOf<Pair<String,String>>()
@@ -41,7 +40,6 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
             mp3List.add(i.title to i.url)
         }
         book.mp3List=mp3List
-        Log.e("getBookDetailedPar",book.toString())
         return book
     }
 
