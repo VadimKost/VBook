@@ -45,7 +45,7 @@ class MediaService: Service() {
 
     val trackTime = flow{
         while (true){
-            emit(player.currentPosition)
+            emit(player.currentPosition to player.duration)
             delay(1000L)
         }
     }

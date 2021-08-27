@@ -23,11 +23,12 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
             .referrer("http://www.google.com").timeout(1000).get()
         val scripts =doc.getElementsByTag("script")
+        //Todo Make more Universal
         for(i in scripts){
-            val list = Regex("[\\[{].+[\\}]]").find(i.toString())?.next()?.value
+            val list = Regex("[\\[{].+[\\}]]").find(i.toString())?.value
             if (list != null){
                 jsonMp3 =list
-                Log.e("VVV",jsonMp3)
+                Log.d("VVV",jsonMp3)
             }
         }
         jsonMp3=jsonMp3.split("]")[0]+"]"
@@ -40,6 +41,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
             mp3List.add(i.title to i.url)
         }
         book.mp3List=mp3List
+        Log.e("getBookDetailedPar",book.toString())
         return book
     }
 
