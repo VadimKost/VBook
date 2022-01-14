@@ -41,7 +41,9 @@ class BookDetailedVM @Inject constructor(
                     withContext(Dispatchers.Main){
                         _serviceState.value.isSuccess {
                             it.data.setBook(book.data)
+                            it.data.mediaNotificationManager.showNotificationForPlayer(it.data.player)
                         }
+
                     }
                 }
                 is Result.Error -> {

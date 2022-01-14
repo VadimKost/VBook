@@ -5,4 +5,6 @@
     <string name="previ">pre</string>
     <string name="play">asd</string>
     <string name="pause">pp</string>
+    <string name="channel_name">Media</string>
+    <string name="channel_description">Well Done</string>
 </resources>

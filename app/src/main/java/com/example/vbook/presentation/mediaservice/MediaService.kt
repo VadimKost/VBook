@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
@@ -14,7 +15,6 @@ import com.example.vbook.domain.usecases.UpdateBook
 import com.example.vbook.getStateData
 import com.example.vbook.presentation.common.UiState
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,7 +50,7 @@ class MediaService: Service() {
         }
     }
 
-    private lateinit var notificationManager: NotificationManager
+    lateinit var mediaNotificationManager: MediaNotificationManager
     private var isForegroundService = false
 
     @Inject
@@ -88,12 +88,13 @@ class MediaService: Service() {
         mediaSessionConnector = MediaSessionConnector(mediaSession)
         mediaSessionConnector.setPlayer(player)
 
-        notificationManager = NotificationManager(
+        mediaNotificationManager = MediaNotificationManager(
             this,
             mediaSession.sessionToken,
-            PlayerNotificationListener()
+            PlayerNotificationListener(),
+            scope
         )
-        notificationManager.showNotificationForPlayer(player)
+
     }
 
     override fun onDestroy() {
@@ -123,10 +124,12 @@ class MediaService: Service() {
                         .setTitle(book.title)
                         .setArtist(book.author.first)
                         .setTrackNumber(index)
+                        .setArtworkUri(Uri.parse(book.coverURL))
                         .build()
                 )
                 .build()
             )
+            Log.e("VVV",Uri.parse(book.coverURL).toString())
         }
         player.seekTo(initialWindowIndex, playbackStartPositionMs)
         updatePlayBackMeta()

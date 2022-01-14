@@ -33,6 +33,8 @@ class NewBooksVM @Inject constructor(
     private var bookList= listOf<Book>()
     var page=1
 
+
+
     fun loadMoreNewBooks(){
         viewModelScope.launch(Dispatchers.IO) {
             val books= getPartOfNewBooks(page)
