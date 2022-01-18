@@ -30,7 +30,7 @@ class MediaService: Service() {
     val scope = CoroutineScope(IO)
 
     @Inject
-    lateinit var player: SimpleExoPlayer
+    lateinit var player: ExoPlayer
 
     private val _bookState = MutableStateFlow<UiState<Book>>(UiState.Loading)
     val booksState =_bookState.asStateFlow()

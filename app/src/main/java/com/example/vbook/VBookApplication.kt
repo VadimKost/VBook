@@ -1,4 +1,4 @@
-package com.example.vbook.di
+package com.example.vbook
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

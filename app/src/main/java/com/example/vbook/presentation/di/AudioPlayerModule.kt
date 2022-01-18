@@ -1,4 +1,4 @@
-package com.example.vbook.di
+package com.example.vbook.presentation.di
 
 import android.content.Context
 import com.google.android.exoplayer2.C
@@ -14,7 +14,7 @@ import dagger.hilt.android.scopes.ServiceScoped
 
 @Module
 @InstallIn(ServiceComponent::class)
-class ServiceModule {
+class AudioPlayerModule {
 
     @Provides
     @ServiceScoped
@@ -28,7 +28,7 @@ class ServiceModule {
     fun provideExoPlayer(
         @ApplicationContext context: Context,
         audioAttributes: AudioAttributes
-    )=SimpleExoPlayer.Builder(context)
+    )=ExoPlayer.Builder(context)
         .setAudioAttributes(audioAttributes, true)
         .setHandleAudioBecomingNoisy(true)
         .build()

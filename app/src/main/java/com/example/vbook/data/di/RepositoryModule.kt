@@ -1,4 +1,4 @@
-package com.example.vbook.di
+package com.example.vbook.data.di
 
 import com.example.vbook.data.repository.BookRepositoryImpl
 import com.example.vbook.domain.repository.BookRepository

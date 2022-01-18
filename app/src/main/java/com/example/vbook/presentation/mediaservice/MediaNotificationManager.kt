@@ -54,10 +54,12 @@ class MediaNotificationManager(
     }
 
     fun showNotificationForPlayer(player: Player) {
-        coroutineScope.launch {
+        coroutineScope.launch(Dispatchers.Main) {
             val uri = player.currentMediaItem?.mediaMetadata?.artworkUri
             if (uri != null) {
-                icon = loadBookBitmap(context, uri)
+                withContext(Dispatchers.IO){
+                    icon = loadBookBitmap(context, uri)
+                }
                 notificationManager.setPlayer(player)
             }
 
