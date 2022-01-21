@@ -6,7 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 //Check error(boolean?)
 @Singleton
-class UpdateBook @Inject constructor(
+class UpdateBookUseCase @Inject constructor(
     val bookRepository: BookRepository
 ) {
     suspend operator fun invoke(book: Book) =bookRepository.updateBook(book)

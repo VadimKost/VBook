@@ -9,7 +9,7 @@ import javax.inject.Singleton
 
 
 @Singleton
-class GetFilledBook @Inject constructor(
+class GetFilledBookUseCase @Inject constructor(
     val bookRepository: BookRepository
 ) {
     suspend operator fun invoke(

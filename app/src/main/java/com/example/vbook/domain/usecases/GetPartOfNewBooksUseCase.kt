@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GetPartOfNewBooks @Inject constructor(
+class GetPartOfNewBooksUseCase @Inject constructor(
    val bookRepository: BookRepository
 ) {
     suspend operator fun invoke(page:Int): Result<List<Book>> {
