@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.vbook.domain.model.Book
@@ -28,21 +29,21 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun NewBooksScreen(
-    vm:NewBooksVM,
+    vm: NewBooksVM = hiltViewModel(),
     navController: NavController
 ) {
-    val isRefreshing =vm.isRefreshing.collectAsState()
-    val swipeEnabled =vm.canBeRefreshed.collectAsState()
+    val isRefreshing = vm.isRefreshing.collectAsState()
+    val swipeEnabled = vm.canBeRefreshed.collectAsState()
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = isRefreshing.value),
         onRefresh = vm::refresh,
         swipeEnabled = swipeEnabled.value
-    ){
+    ) {
         NewBooksBody(
             booksState = vm.booksState.collectAsState().value,
             onItemClick = { bookUrl ->
-                navController.navigate(VBookScreen.BookDetailed.name.addArgs("bookUrl",bookUrl))
+                navController.navigate(VBookScreen.BookDetailed.name.addArgs("bookUrl", bookUrl))
             },
             onAddMore = vm::loadMoreNewBooks
         )
@@ -53,14 +54,14 @@ fun NewBooksScreen(
 @Composable
 fun NewBooksBody(
     booksState: UiState<List<Book>>,
-    onItemClick: (String) -> Unit ={},
-    onAddMore: () -> Unit ={}
+    onItemClick: (String) -> Unit = {},
+    onAddMore: () -> Unit = {}
 ) {
     StateSection(state = booksState) { books ->
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
-        ){
-            items(books){book ->
+        ) {
+            items(books) { book ->
                 Card(
                     border = BorderStroke(1.dp, Color.Gray),
                     modifier = Modifier
@@ -72,12 +73,12 @@ fun NewBooksBody(
                     Row {
                         Image(
                             painter = rememberImagePainter(
-                                data=book.coverURL,
+                                data = book.coverURL,
                                 builder = {
                                     crossfade(true)
                                 },
                             ),
-                            contentScale= ContentScale.FillWidth,
+                            contentScale = ContentScale.FillWidth,
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(5.dp)
@@ -85,7 +86,7 @@ fun NewBooksBody(
                         )
                         Column {
                             Text(
-                                text =book.title,
+                                text = book.title,
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 textAlign = TextAlign.Center
@@ -109,7 +110,7 @@ fun NewBooksBody(
                 }
             }
 
-            item{
+            item {
                 Button(
                     onClick = onAddMore,
                     modifier = Modifier

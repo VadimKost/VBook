@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
-import com.example.vbook.domain.usecases.GetPartOfNewBooks
+import com.example.vbook.domain.usecases.GetPartOfNewBooksUseCase
 import com.example.vbook.presentation.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NewBooksVM @Inject constructor(
-    val getPartOfNewBooks: GetPartOfNewBooks,
+    val getPartOfNewBooks: GetPartOfNewBooksUseCase,
 ):ViewModel() {
     init {
         loadMoreNewBooks()

@@ -23,7 +23,7 @@ fun VBookNavHost(
         startDestination = VBookScreen.NewBooks.name,
         modifier = modifier
     ) {
-        composable(VBookScreen.NewBooks.name){
+        composable(VBookScreen.NewBooks.name) {
             val vm = hiltViewModel<NewBooksVM>()
             NewBooksScreen(vm, navController)
         }
@@ -31,9 +31,9 @@ fun VBookNavHost(
             VBookScreen.BookDetailed.name.addPathArgs("bookUrl"),
             arguments = listOf(navArgument("bookUrl") {
                 type = NavType.StringType
-                nullable=true
+                nullable = true
             })
-        ){
+        ) {
             val vm = hiltViewModel<BookDetailedVM>()
             val bookUrl = it.arguments?.getString("bookUrl")
             vm.setServiceBook(bookUrl!!)
@@ -41,3 +41,4 @@ fun VBookNavHost(
         }
     }
 }
+
