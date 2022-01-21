@@ -19,10 +19,12 @@ import coil.request.ImageRequest
 import com.example.vbook.R
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 
 class MediaNotificationManager(
@@ -66,7 +68,7 @@ class MediaNotificationManager(
         }
     }
 
-    suspend fun loadBookBitmap(context: Context, artworkUri: Uri): Bitmap {
+    private suspend fun loadBookBitmap(context: Context, artworkUri: Uri): Bitmap {
         val loader = ImageLoader(context)
         return withContext(Dispatchers.Main) {
             val request = ImageRequest.Builder(context)
@@ -79,7 +81,7 @@ class MediaNotificationManager(
         }
     }
 
-    fun createNotificationChannel(channelId: String, channelName: String): String {
+    private fun createNotificationChannel(channelId: String, channelName: String): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val chan = NotificationChannel(
                 channelId,

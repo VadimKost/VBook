@@ -11,70 +11,43 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.vbook.domain.model.Book
-import com.example.vbook.domain.usecases.UpdateBook
-import com.example.vbook.getStateData
-import com.example.vbook.presentation.common.UiState
+import com.example.vbook.domain.usecases.UpdateBookUseCase
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MediaService: Service() {
-    val scope = CoroutineScope(IO)
+class MediaService : Service() {
+    private val serviceCoroutineScope = CoroutineScope(IO)
 
     @Inject
     lateinit var player: ExoPlayer
 
-    private val _bookState = MutableStateFlow<UiState<Book>>(UiState.Loading)
-    val booksState =_bookState.asStateFlow()
-
-    private val _isPlaying = MutableStateFlow(false)
-    val isPlaying = _isPlaying.asStateFlow()
-
-    private val _hasNext = MutableStateFlow(false)
-    val hasNext = _hasNext.asStateFlow()
-
-    val trackIndex= MutableStateFlow(0)
-
-    val trackTime = flow{
-        while (true){
-            emit(player.currentPosition to player.duration)
-            delay(1000L)
-        }
-    }
-
-    lateinit var mediaNotificationManager: MediaNotificationManager
+    private lateinit var mediaNotificationManager: MediaNotificationManager
+    private lateinit var mediaPlayerManager: MediaPlayerManager
     private var isForegroundService = false
 
     @Inject
-    lateinit var updateBook: UpdateBook
-    
+    lateinit var updateBookUseCase: UpdateBookUseCase
+
+
+    private val _serviceBook = MutableStateFlow<Book?>(null)
+    val serviceBook = _serviceBook.asStateFlow()
+
     private lateinit var mediaSessionConnector: MediaSessionConnector
     private lateinit var mediaSession: MediaSessionCompat
 
-    fun setBook(book: Book){
-        val stateBook = getStateData(_bookState.value)
-        if (stateBook != book){
-            preparePlayList(book)
-            _bookState.value =UiState.Success(book)
-        }
-
-    }
-    fun onError(message:String){
-        _bookState.value = UiState.Error(message)
-    }
+    lateinit var playbackInfo:Flow<MediaPlayerManager.PlaybackInfo>
 
     override fun onCreate() {
+        Log.e("VVV", "onCreate")
         super.onCreate()
-        player.prepare()
-        player.addListener(PlayerEventListener())
         val sessionActivityPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
                 PendingIntent.getActivity(this, 0, sessionIntent, 0)
@@ -85,6 +58,7 @@ class MediaService: Service() {
                 setSessionActivity(sessionActivityPendingIntent)
                 isActive = true
             }
+
         mediaSessionConnector = MediaSessionConnector(mediaSession)
         mediaSessionConnector.setPlayer(player)
 
@@ -92,96 +66,67 @@ class MediaService: Service() {
             this,
             mediaSession.sessionToken,
             PlayerNotificationListener(),
-            scope
+            serviceCoroutineScope
         )
 
+        mediaPlayerManager = MediaPlayerManager(
+            player,
+            serviceCoroutineScope,
+            updateBookUseCase::invoke,
+            PlayerEventListener()
+        )
+        playbackInfo = mediaPlayerManager.playbackInfo
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        savePlayListMeta(getStateData(_bookState.value),player.currentWindowIndex,player.contentPosition)
+        Log.e("VVV", "onDestroy")
+        mediaPlayerManager.saveBookStoppedIndexAndTime(_serviceBook.value)
         mediaSession.release()
         player.release()
-        scope.cancel()
-    }
-
-    private fun preparePlayList(book: Book) {
-        val old =getStateData(_bookState.value)
-        if (old != null){
-            savePlayListMeta(old,player.currentWindowIndex,player.contentPosition)
-            Log.d("BookProbable","${old.title} i= ${player.currentWindowIndex} t = ${player.contentPosition}")
-        }
-
-        player.clearMediaItems()
-        val initialWindowIndex = book.stoppedTrackIndex
-        val playbackStartPositionMs = book.stoppedTrackTime
-
-        book.mp3List!!.forEachIndexed { index, track ->
-            player.addMediaItem(MediaItem.Builder()
-                .setUri(track.second)
-                .setMediaMetadata(
-                    MediaMetadata.Builder()
-                        .setTitle(book.title)
-                        .setArtist(book.author.first)
-                        .setTrackNumber(index)
-                        .setArtworkUri(Uri.parse(book.coverURL))
-                        .build()
-                )
-                .build()
-            )
-            Log.e("VVV",Uri.parse(book.coverURL).toString())
-        }
-        player.seekTo(initialWindowIndex, playbackStartPositionMs)
-        updatePlayBackMeta()
+        serviceCoroutineScope.cancel()
     }
 
     inner class PlayerServiceBinder : Binder() {
         val service = this@MediaService
     }
+
     override fun onBind(intent: Intent): IBinder {
         return PlayerServiceBinder()
     }
+
+    fun setBook(book: Book) {
+        val oldBook = _serviceBook.value
+        if (oldBook != book) {
+            mediaPlayerManager.preparePlayListForPlayer(book,oldBook)
+            _serviceBook.value = book
+            mediaNotificationManager.showNotificationForPlayer(player)
+
+        }
+
+    }
+
+
     private inner class PlayerEventListener : Player.Listener {
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            updatePlayBackMeta()
+            mediaPlayerManager.updatePlayListStateInfo()
         }
 
         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-            if (!playWhenReady){
+            if (!playWhenReady) {
                 stopForeground(false)
                 isForegroundService = false
-                updatePlayBackMeta()
-                Log.d("Book","stop")
-                savePlayListMeta(getStateData(_bookState.value),player.currentWindowIndex,player.contentPosition)
-            }else{
-                updatePlayBackMeta()
+                mediaPlayerManager.updatePlayListStateInfo()
+                Log.d("Book", "stop")
+                mediaPlayerManager.saveBookStoppedIndexAndTime(_serviceBook.value,)
+            } else {
+                mediaPlayerManager.updatePlayListStateInfo()
             }
         }
     }
-    fun savePlayListMeta(book: Book?,trackIndex:Int,trackTime: Long){
-        scope.launch {
-            if (book != null){
-                withContext(Main){
-                    Log.d("BookSet","${book.title} i= $trackIndex t = ${player.contentPosition}")
-                    book.stoppedTrackIndex= trackIndex
-                    book.stoppedTrackTime= trackTime
-                }
-                withContext(IO){
-                    updateBook(book)
-                }
-            }
-        }
 
-    }
-
-    fun updatePlayBackMeta(){
-        trackIndex.value = player.currentWindowIndex
-        _isPlaying.value = player.playWhenReady
-        _hasNext.value = player.hasNextWindow()
-    }
-
-    inner class PlayerNotificationListener :
+    private inner class PlayerNotificationListener :
         PlayerNotificationManager.NotificationListener {
         override fun onNotificationPosted(
             notificationId: Int,

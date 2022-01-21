@@ -1,6 +1,7 @@
 package com.example.vbook.presentation.di
 
 import android.content.Context
+import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -28,10 +29,14 @@ class AudioPlayerModule {
     fun provideExoPlayer(
         @ApplicationContext context: Context,
         audioAttributes: AudioAttributes
-    )=ExoPlayer.Builder(context)
+    ) = ExoPlayer.Builder(context)
         .setAudioAttributes(audioAttributes, true)
         .setHandleAudioBecomingNoisy(true)
         .build()
 
-
-    }
+    @Provides
+    @ServiceScoped
+    fun provideMediaSession(
+        @ApplicationContext context: Context
+    )= MediaSessionCompat(context, "VBookService")
+}
