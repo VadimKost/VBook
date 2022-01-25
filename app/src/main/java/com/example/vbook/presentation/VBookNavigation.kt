@@ -8,10 +8,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
-import com.example.vbook.presentation.bookdetailed.BookDetailedScreen
-import com.example.vbook.presentation.bookdetailed.BookDetailedVM
-import com.example.vbook.presentation.newbooks.NewBooksScreen
-import com.example.vbook.presentation.newbooks.NewBooksVM
+import com.example.vbook.presentation.ui.bookdetailed.BookDetailedScreen
+import com.example.vbook.presentation.ui.bookdetailed.BookDetailedVM
+import com.example.vbook.presentation.ui.newbooks.NewBooksScreen
+import com.example.vbook.presentation.ui.newbooks.NewBooksVM
 
 @Composable
 fun VBookNavHost(

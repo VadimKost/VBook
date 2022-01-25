@@ -1,4 +1,4 @@
-package com.example.vbook.presentation.newbooks
+package com.example.vbook.presentation.ui.newbooks
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

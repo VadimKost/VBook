@@ -11,10 +11,9 @@ import com.example.vbook.data.db.model.BookEntity
 import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
 import com.example.vbook.presentation.common.UiState
-import com.example.vbook.presentation.mediaservice.MediaService
+import com.example.vbook.presentation.service.mediaservice.MediaService
 import com.google.gson.JsonSyntaxException
 import java.lang.IllegalStateException
-import java.time.Duration
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

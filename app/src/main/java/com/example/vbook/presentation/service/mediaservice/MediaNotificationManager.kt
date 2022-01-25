@@ -1,4 +1,4 @@
-package com.example.vbook.presentation.mediaservice
+package com.example.vbook.presentation.service.mediaservice
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -12,19 +12,16 @@ import android.net.Uri
 import android.os.Build
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
 import coil.request.ImageRequest
 import com.example.vbook.R
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 
 class MediaNotificationManager(

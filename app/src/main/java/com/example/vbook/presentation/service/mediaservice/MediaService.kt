@@ -1,10 +1,9 @@
-package com.example.vbook.presentation.mediaservice
+package com.example.vbook.presentation.service.mediaservice
 
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat

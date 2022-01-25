@@ -1,4 +1,4 @@
-package com.example.vbook.presentation.newbooks
+package com.example.vbook.presentation.ui.newbooks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

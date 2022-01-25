@@ -1,13 +1,12 @@
-package com.example.vbook.presentation.bookdetailed
+package com.example.vbook.presentation.ui.bookdetailed
 
 import android.content.Context
-import android.content.Intent
 import android.content.ServiceConnection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vbook.bindService
 import com.example.vbook.domain.usecases.GetFilledBookUseCase
-import com.example.vbook.presentation.mediaservice.MediaService
+import com.example.vbook.presentation.service.mediaservice.MediaService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
