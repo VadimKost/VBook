@@ -34,8 +34,8 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         jsonMp3=jsonMp3.split("]")[0]+"]"
         val gson = GsonBuilder()
             .create()
-        val itemsListType = object : TypeToken<List<BookMedia>>() {}.type
-        val list=gson.fromJson<List<BookMedia>>(jsonMp3,itemsListType)
+        val itemsListType = object : TypeToken<List<BookMediaParserItem>>() {}.type
+        val list=gson.fromJson<List<BookMediaParserItem>>(jsonMp3,itemsListType)
         val mp3List= mutableListOf<Pair<String,String>>()
         for(i in list){
             mp3List.add(i.title to i.url)
@@ -84,16 +84,12 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         return list
     }
 
-    data class  BookMedia(
+    private data class  BookMediaParserItem(
         val id : Int,
         val title : String,
         val url : String,
         val error : Int,
         val duration : Int,
         val duration_float : Double
-    ){
-        fun fillBookWithMedia(book: Book,bookMedia: BookMedia): Book {
-            return book
-        }
-    }
+    )
 }

@@ -11,7 +11,8 @@ data class Book(
     val cycle:Pair<String,String>,
     var cycleBookList: List<Pair<String,String>>?=null,
     var duration: String?=null,
-    var isCurrent:Boolean,
+
+    var isCurrent:Boolean=false,
 
     var stoppedTrackIndex:Int=0,
     var stoppedTrackTime: Long=0,
