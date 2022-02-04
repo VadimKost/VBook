@@ -2,8 +2,7 @@ package com.example.vbook.data.db.dao
 
 import androidx.room.*
 import com.example.vbook.data.db.model.BookEntity
-import com.example.vbook.data.db.model.TypeConvertor
-import kotlinx.coroutines.flow.Flow
+import com.example.vbook.data.db.TypeConvertor
 
 @Dao
 @TypeConverters(TypeConvertor::class)

@@ -94,7 +94,7 @@ class MediaService : Service() {
         return PlayerServiceBinder()
     }
 
-    fun setBook(book: Book) {
+    suspend fun setBook(book: Book) {
         val oldBook = _serviceBook.value
         if (oldBook != book) {
             mediaPlayerManager.preparePlayListForPlayer(book,oldBook)

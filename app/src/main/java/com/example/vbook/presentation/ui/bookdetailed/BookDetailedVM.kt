@@ -43,8 +43,9 @@ class BookDetailedVM @Inject constructor(
             when (val book = getFilledBook(bookUrl)) {
                 is Result.Success -> {
                     withContext(Dispatchers.Main) {
-                        _serviceState.value.isSuccess {
-                            it.data.setBook(book.data)
+                        val state = _serviceState.value
+                        if (state is UiState.Success) {
+                            state.data.setBook(book.data)
                         }
 
                     }

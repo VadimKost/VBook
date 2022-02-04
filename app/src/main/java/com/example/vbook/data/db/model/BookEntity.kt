@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.vbook.domain.model.Book
+import com.example.vbook.data.db.TypeConvertor
 
 @Entity(tableName = "BookEntity")
 @TypeConverters(TypeConvertor::class)

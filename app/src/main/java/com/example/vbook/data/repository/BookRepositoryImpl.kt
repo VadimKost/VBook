@@ -12,7 +12,6 @@ import com.example.vbook.isDetailed
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class BookRepositoryImpl @Inject constructor(
     val DB:AppDatabase,
