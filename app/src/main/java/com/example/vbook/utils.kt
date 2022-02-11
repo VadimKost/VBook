@@ -8,8 +8,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.compose.runtime.Composable
 import com.example.vbook.data.db.model.BookEntity
-import com.example.vbook.domain.common.Result
-import com.example.vbook.domain.model.Book
+import com.example.vbook.presentation.model.Book
 import com.example.vbook.presentation.common.UiState
 import com.example.vbook.presentation.service.mediaservice.MediaService
 import com.google.gson.JsonSyntaxException

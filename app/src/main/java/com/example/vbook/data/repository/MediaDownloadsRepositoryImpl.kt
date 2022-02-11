@@ -1,8 +1,7 @@
 package com.example.vbook.data.repository
 
 import com.example.vbook.data.db.AppDatabase
-import com.example.vbook.domain.common.Result
-import com.example.vbook.domain.model.MediaItemDownload
+import com.example.vbook.presentation.model.MediaItemDownload
 import com.example.vbook.domain.repository.MediaDownloadsRepository
 import javax.inject.Inject
 import javax.inject.Singleton

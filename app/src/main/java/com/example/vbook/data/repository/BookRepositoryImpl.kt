@@ -5,8 +5,7 @@ import com.example.vbook.data.mapper.toBook
 import com.example.vbook.data.mapper.toBookEntity
 import com.example.vbook.data.mapper.toBookEntityList
 import com.example.vbook.data.parsers.KnigaVUheParser
-import com.example.vbook.domain.common.Result
-import com.example.vbook.domain.model.Book
+import com.example.vbook.presentation.model.Book
 import com.example.vbook.domain.repository.BookRepository
 import com.example.vbook.isDetailed
 import javax.inject.Inject

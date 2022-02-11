@@ -1,4 +1,4 @@
-package com.example.vbook.domain.model
+package com.example.vbook.presentation.model
 
 data class MediaItemDownload(
     var mediaUri:String,

@@ -9,7 +9,7 @@ import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.example.vbook.domain.model.Book
+import com.example.vbook.presentation.model.Book
 import com.example.vbook.domain.usecases.UpdateBookUseCase
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector

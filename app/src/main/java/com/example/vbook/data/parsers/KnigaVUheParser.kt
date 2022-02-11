@@ -1,7 +1,7 @@
 package com.example.vbook.data.parsers
 
 import android.util.Log
-import com.example.vbook.domain.model.Book
+import com.example.vbook.presentation.model.Book
 import org.jsoup.Jsoup
 import javax.inject.Inject
 import com.google.gson.GsonBuilder
