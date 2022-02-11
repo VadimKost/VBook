@@ -1,7 +1,9 @@
 package com.example.vbook.presentation.ui.bookdetailed
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.vbook.domain.model.Book
+import com.example.vbook.presentation.common.UiState
 import com.example.vbook.toTime
 import com.example.vbook.presentation.common.components.StateSection
 import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
@@ -34,9 +37,12 @@ fun BookDetailedScreen(
         val bookState = service.serviceBook.collectAsState()
         val book = bookState.value
 
+        val mediaItemDownloadStatusList = vm.mediaItemDownloadStatusList.collectAsState()
+
         if (book != null) {
             BookDetailedBody(
                 book = book,
+                mediaItemDownloadStatusList = mediaItemDownloadStatusList.value,
                 trackIndex = playbackInfo.trackIndex,
                 trackTime = playbackInfo.trackTime,
                 hasNext = playbackInfo.hasNext,
@@ -57,6 +63,7 @@ fun BookDetailedScreen(
 @Composable
 fun BookDetailedBody(
     book: Book,
+    mediaItemDownloadStatusList: List<UiState<Unit>>,
     trackIndex: Int,
     trackTime: Pair<Long, Long>,
     isPlaying: Boolean,
@@ -69,6 +76,10 @@ fun BookDetailedBody(
     onPrevious: () -> Unit = {},
     onSeek: (Long) -> Unit
 ) {
+    var downloadDialogIsOpened by remember { mutableStateOf(false)}
+    if (downloadDialogIsOpened){
+        DownloadsDialog(mediaItemList = book.mp3List!! , mediaItemDownloadStatusList = mediaItemDownloadStatusList , onDismiss = {downloadDialogIsOpened = false })
+    }
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,6 +103,7 @@ fun BookDetailedBody(
                     "(${trackIndex + 1} из ${book.mp3List!!.size})",
             modifier = Modifier.weight(1f)
         )
+        Text(text = "Open", modifier = Modifier.clickable { downloadDialogIsOpened = true })
         PlayerController(
             modifier = Modifier
                 .weight(3f)
@@ -210,4 +222,43 @@ fun MediaControlButton(
                 .size(size)
         )
     }
+}
+
+@Composable
+fun DownloadsDialog(mediaItemList:List<Pair<String,String>>,mediaItemDownloadStatusList:List<UiState<Unit>> ,onDismiss: ()->Unit) {
+    AlertDialog(
+        onDismissRequest = {onDismiss()},
+        title = {
+            Text(text = "Downloads")
+        },
+        text = {
+               LazyColumn(modifier = Modifier.fillMaxSize()){
+                   items(mediaItemList.size){ index ->
+                       Row(modifier = Modifier
+                           .fillMaxWidth()
+                           .height(20.dp)){
+                           Text(text = mediaItemList[index].first )
+                           when(mediaItemDownloadStatusList[index]){
+                               is UiState.Success -> { Text(text = "Downloaded")}
+                               is UiState.Loading -> { Text(text = "Loading")}
+                               else -> { Text(text = "Tap to download")}
+                           }
+                       }
+                   }
+               }
+        },
+        buttons = {
+            Row(
+                modifier = Modifier.padding(all = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {onDismiss()}
+                ) {
+                    Text("Dismiss")
+                }
+            }
+        }
+    )
 }

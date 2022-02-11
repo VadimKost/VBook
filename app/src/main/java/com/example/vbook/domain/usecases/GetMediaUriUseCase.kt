@@ -9,7 +9,7 @@ import javax.inject.Singleton
 
 @Singleton
 class GetMediaUriUseCase @Inject constructor(
-    val mediaDownloadsRepository: MediaDownloadsRepository
+    private val mediaDownloadsRepository: MediaDownloadsRepository
 ) {
     suspend operator fun invoke(uri: String): Result<String> {
         return try {

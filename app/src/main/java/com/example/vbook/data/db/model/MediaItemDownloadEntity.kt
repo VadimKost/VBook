@@ -13,7 +13,7 @@ import com.example.vbook.data.db.TypeConvertor
 @TypeConverters(TypeConvertor::class)
 data class MediaItemDownloadEntity(
     @PrimaryKey
-    var mediaUri:String,
+    var mediaOnlineUri:String,
     var downloadId:Long,
     var bookUrl:String
 )

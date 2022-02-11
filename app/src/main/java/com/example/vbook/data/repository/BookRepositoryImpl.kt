@@ -1,9 +1,8 @@
 package com.example.vbook.data.repository
 
 import com.example.vbook.data.db.AppDatabase
-import com.example.vbook.data.mapper.toBook
-import com.example.vbook.data.mapper.toBookEntity
-import com.example.vbook.data.mapper.toBookEntityList
+import com.example.vbook.data.mapper.mapToDomain
+import com.example.vbook.data.mapper.mapToData
 import com.example.vbook.data.parsers.KnigaVUheParser
 import com.example.vbook.domain.common.Result
 import com.example.vbook.domain.model.Book
@@ -20,7 +19,7 @@ class BookRepositoryImpl @Inject constructor(
 
     override suspend fun fetchNewBooks(page:Int): Result<List<Book>> {
         val books=knigaVUheParser.getAllNewBooks(page)
-        val booksEntity = books.toBookEntityList()
+        val booksEntity = books.mapToData()
         DB.bookDao().insert(booksEntity)
         return Result.Success(books)
     }
@@ -31,9 +30,9 @@ class BookRepositoryImpl @Inject constructor(
         val bookEntity=DB.bookDao().getBook(bookUrl)
         if (bookEntity != null) {
             if (bookEntity.isDetailed()){
-                return Result.Success(bookEntity.toBook())
+                return Result.Success(bookEntity.mapToDomain())
             }else{
-                val book = bookEntity.toBook()
+                val book = bookEntity.mapToDomain()
                 val bookDetailed=knigaVUheParser.getFilledBook(book)
                 updateBook(book)
                 return Result.Success(bookDetailed)
@@ -46,7 +45,7 @@ class BookRepositoryImpl @Inject constructor(
     override suspend fun getCurrentBook(): Result<Book> {
         val bookEntity = DB.bookDao().getCurrentBook()
         if (bookEntity != null){
-            return Result.Success(bookEntity.toBook())
+            return Result.Success(bookEntity.mapToDomain())
         }else{
             return Result.Error("NoCurrentBook")
         }
@@ -54,7 +53,7 @@ class BookRepositoryImpl @Inject constructor(
 
 
     override suspend fun updateBook(book: Book):Boolean{
-        val count = DB.bookDao().updateBook(book.toBookEntity())
+        val count = DB.bookDao().updateBook(book.mapToData())
         return count>=1
     }
 

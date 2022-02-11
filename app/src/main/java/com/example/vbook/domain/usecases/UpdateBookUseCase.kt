@@ -9,5 +9,5 @@ import javax.inject.Singleton
 class UpdateBookUseCase @Inject constructor(
     val bookRepository: BookRepository
 ) {
-    suspend operator fun invoke(book: Book) =bookRepository.updateBook(book)
+    suspend operator fun invoke(book: Book) = bookRepository.updateBook(book)
 }
