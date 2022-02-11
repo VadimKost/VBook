@@ -5,26 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import android.util.Log
 import androidx.compose.runtime.Composable
 import com.example.vbook.data.db.model.BookEntity
 import com.example.vbook.presentation.model.Book
-import com.example.vbook.presentation.common.UiState
+import com.example.vbook.common.ResourceState
 import com.example.vbook.presentation.service.mediaservice.MediaService
-import com.google.gson.JsonSyntaxException
-import java.lang.IllegalStateException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
-fun ThrowableResult(e: Throwable, tag: String = "defError"): Result.Error {
-    Log.e("UseCase $tag", e.stackTraceToString())
-    return when (e) {
-        is IllegalStateException -> Result.Error(e.message + " Error")
-        is JsonSyntaxException -> Result.Error("Parse Error")
-        else -> Result.Error("Other Shit From ThrowableResult")
-    }
-}
-
 
 fun Book.isDetailed(): Boolean {
     return mp3List != null
@@ -35,14 +22,14 @@ fun BookEntity.isDetailed(): Boolean {
 }
 
 @Composable
-fun <T> UiState<T>.IsSuccess(action: @Composable (UiState.Success<T>) -> Unit) {
-    if (this is UiState.Success<T>) {
+fun <T> ResourceState<T>.IsSuccess(action: @Composable (ResourceState.Success<T>) -> Unit) {
+    if (this is ResourceState.Success<T>) {
         action(this)
     }
 }
 
-fun <T> UiState<T>.isSuccess(action: (UiState.Success<T>) -> Unit) {
-    if (this is UiState.Success<T>) {
+fun <T> ResourceState<T>.isSuccess(action: (ResourceState.Success<T>) -> Unit) {
+    if (this is ResourceState.Success<T>) {
         action(this)
     }
 }

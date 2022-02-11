@@ -1,4 +1,4 @@
-package com.example.vbook.presentation.common.components
+package com.example.vbook.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,16 +10,16 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.vbook.presentation.common.UiState
+import com.example.vbook.common.ResourceState
 
 @Composable
 fun <T> StateSection(
-    state: UiState<T>,
+    state: ResourceState<T>,
     modifier:Modifier=Modifier,
     content: @Composable (T) -> Unit)
 {
     when (state) {
-        is UiState.Loading -> {
+        is ResourceState.Loading -> {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -30,7 +30,7 @@ fun <T> StateSection(
             }
 
         }
-        is UiState.Error -> {
+        is ResourceState.Error -> {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -42,10 +42,10 @@ fun <T> StateSection(
             }
 
         }
-        is UiState.Empty -> {
+        is ResourceState.Empty -> {
 
         }
-        is UiState.Success -> {
+        is ResourceState.Success -> {
             content(state.data)
         }
 

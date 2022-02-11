@@ -22,8 +22,8 @@ import coil.compose.rememberImagePainter
 import com.example.vbook.presentation.model.Book
 import com.example.vbook.presentation.VBookScreen
 import com.example.vbook.presentation.addArgs
-import com.example.vbook.presentation.common.UiState
-import com.example.vbook.presentation.common.components.StateSection
+import com.example.vbook.common.ResourceState
+import com.example.vbook.presentation.components.StateSection
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -53,7 +53,7 @@ fun NewBooksScreen(
 
 @Composable
 fun NewBooksBody(
-    booksState: UiState<List<Book>>,
+    booksState: ResourceState<List<Book>>,
     onItemClick: (String) -> Unit = {},
     onAddMore: () -> Unit = {}
 ) {

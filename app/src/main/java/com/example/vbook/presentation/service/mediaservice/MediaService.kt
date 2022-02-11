@@ -9,8 +9,8 @@ import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.example.vbook.data.repository.BookRepository.BookRepository
 import com.example.vbook.presentation.model.Book
-import com.example.vbook.domain.usecases.UpdateBookUseCase
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
@@ -33,7 +33,7 @@ class MediaService : Service() {
     private var isForegroundService = false
 
     @Inject
-    lateinit var updateBookUseCase: UpdateBookUseCase
+    lateinit var bookRepository: BookRepository
 
 
     private val _serviceBook = MutableStateFlow<Book?>(null)
@@ -71,7 +71,7 @@ class MediaService : Service() {
         mediaPlayerManager = MediaPlayerManager(
             player,
             serviceCoroutineScope,
-            updateBookUseCase::invoke,
+            bookRepository::updateBook,
             PlayerEventListener()
         )
         playbackInfo = mediaPlayerManager.playbackInfo

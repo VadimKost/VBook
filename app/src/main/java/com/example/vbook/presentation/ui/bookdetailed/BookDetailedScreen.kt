@@ -16,7 +16,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.vbook.presentation.model.Book
 import com.example.vbook.toTime
-import com.example.vbook.presentation.common.components.StateSection
+import com.example.vbook.presentation.components.StateSection
 import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.example.vbook.toSliderFloat
 
@@ -25,32 +25,29 @@ fun BookDetailedScreen(
     vm: BookDetailedVM,
     navController: NavController
 ) {
-    val serviceState = vm.serviceState.collectAsState()
-    StateSection(state = serviceState.value) { service ->
-        val player = service.player
+    val bookState = vm.bookState.collectAsState()
+    StateSection(state = bookState.value) { book ->
         val playbackInfo =
-            service.playbackInfo.collectAsState(MediaPlayerManager.PlaybackInfo()).value
+            vm.playbackMetadata.collectAsState(initial = MediaPlayerManager.PlaybackInfo()).value
+        val player = vm.player
 
-        val bookState = service.serviceBook.collectAsState()
-        val book = bookState.value
-
-        if (book != null) {
-            BookDetailedBody(
-                book = book,
-                trackIndex = playbackInfo.trackIndex,
-                trackTime = playbackInfo.trackTime,
-                hasNext = playbackInfo.hasNext,
-                isPlaying = playbackInfo.isPlaying,
-                onPlay = player::play,
-                onPause = player::pause,
-                onRewind = player::seekBack,
-                onForward = player::seekForward,
-                onNext = player::seekToNextWindow,
-                onPrevious = player::seekToPreviousWindow,
-                onSeek = { player.seekTo(it) }
-            )
-        }
+        BookDetailedBody(
+            book = book,
+            trackIndex = playbackInfo.trackIndex,
+            trackTime = playbackInfo.trackTime,
+            hasNext = playbackInfo.hasNext,
+            isPlaying = playbackInfo.isPlaying,
+            onPlay = player::play,
+            onPause = player::pause,
+            onRewind = player::seekBack,
+            onForward = player::seekForward,
+            onNext = player::seekToNextWindow,
+            onPrevious = player::seekToPreviousWindow,
+            onSeek = { player.seekTo(it) }
+        )
     }
+
+
 }
 
 
