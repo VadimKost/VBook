@@ -1,4 +1,4 @@
-package com.example.vbook.presentation.service.mediaservice
+package com.example.vbook.service.mediaservice
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -9,8 +9,8 @@ import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.example.vbook.data.repository.BookRepository.BookRepository
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.data.repository.book.BookRepository
+import com.example.vbook.common.model.Book
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager

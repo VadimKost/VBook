@@ -1,7 +1,7 @@
 package com.example.vbook.data.db
 
 import androidx.room.TypeConverter
-import com.example.vbook.data.db.model.MediaItemDownloadEntity
+import com.example.vbook.data.db.model.DownloadingItemEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import javax.inject.Inject
@@ -13,13 +13,13 @@ class TypeConvertor{
     lateinit var gson:Gson
 
     @TypeConverter
-    fun fromMediaItemDownloadList(downloadList: List<MediaItemDownloadEntity>):String{
+    fun fromMediaItemDownloadList(downloadList: List<DownloadingItemEntity>):String{
         return gson.toJson(downloadList)
     }
 
     @TypeConverter
-    fun toMediaItemDownloadList(string: String):List<MediaItemDownloadEntity>{
-        val type = object :TypeToken<List<MediaItemDownloadEntity>>(){}.type
+    fun toMediaItemDownloadList(string: String):List<DownloadingItemEntity>{
+        val type = object :TypeToken<List<DownloadingItemEntity>>(){}.type
         return gson.fromJson(string,type)
     }
 

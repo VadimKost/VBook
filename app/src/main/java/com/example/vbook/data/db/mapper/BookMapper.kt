@@ -1,7 +1,7 @@
-package com.example.vbook.data.mapper
+package com.example.vbook.data.db.mapper
 
 import com.example.vbook.data.db.model.BookEntity
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.common.model.Book
 
 fun Book.toBookEntity()= BookEntity(
     source,

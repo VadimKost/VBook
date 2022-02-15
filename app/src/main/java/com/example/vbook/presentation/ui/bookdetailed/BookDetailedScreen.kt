@@ -14,10 +14,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.common.model.Book
 import com.example.vbook.toTime
 import com.example.vbook.presentation.components.StateSection
-import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
+import com.example.vbook.service.mediaservice.MediaPlayerManager
 import com.example.vbook.toSliderFloat
 
 @Composable

@@ -11,7 +11,7 @@ import com.example.vbook.data.db.TypeConvertor
         onDelete = ForeignKey.CASCADE
     )])
 @TypeConverters(TypeConvertor::class)
-data class MediaItemDownloadEntity(
+data class DownloadingItemEntity(
     @PrimaryKey
     var mediaUri:String,
     var downloadId:Long,

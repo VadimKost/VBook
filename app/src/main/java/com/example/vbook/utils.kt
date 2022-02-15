@@ -7,9 +7,9 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.compose.runtime.Composable
 import com.example.vbook.data.db.model.BookEntity
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.common.model.Book
 import com.example.vbook.common.ResourceState
-import com.example.vbook.presentation.service.mediaservice.MediaService
+import com.example.vbook.service.mediaservice.MediaService
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

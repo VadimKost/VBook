@@ -2,8 +2,8 @@ package com.example.vbook.presentation.ui.newbooks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vbook.data.repository.BookRepository.BookRepository
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.data.repository.book.BookRepository
+import com.example.vbook.common.model.Book
 import com.example.vbook.common.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

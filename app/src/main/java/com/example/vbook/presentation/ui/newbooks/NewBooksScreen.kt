@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.common.model.Book
 import com.example.vbook.presentation.VBookScreen
 import com.example.vbook.presentation.addArgs
 import com.example.vbook.common.ResourceState

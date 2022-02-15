@@ -1,4 +1,4 @@
-package com.example.vbook.presentation.service.mediaservice
+package com.example.vbook.service.mediaservice
 
 import android.app.Notification
 import android.app.NotificationChannel

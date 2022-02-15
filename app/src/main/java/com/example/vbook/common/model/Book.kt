@@ -1,4 +1,4 @@
-package com.example.vbook.presentation.model
+package com.example.vbook.common.model
 
 data class Book(
     var source:String,

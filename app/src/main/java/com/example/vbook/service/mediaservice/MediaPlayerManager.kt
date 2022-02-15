@@ -1,8 +1,8 @@
-package com.example.vbook.presentation.service.mediaservice
+package com.example.vbook.service.mediaservice
 
 import android.net.Uri
 import android.util.Log
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.common.model.Book
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata

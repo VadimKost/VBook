@@ -1,13 +1,12 @@
-package com.example.vbook.data.repository.BookRepository
+package com.example.vbook.data.repository.book
 
 import com.example.vbook.common.ResourceState
 import com.example.vbook.data.db.AppDatabase
-import com.example.vbook.data.mapper.toBook
-import com.example.vbook.data.mapper.toBookEntity
-import com.example.vbook.data.mapper.toBookEntityList
+import com.example.vbook.data.db.mapper.toBook
+import com.example.vbook.data.db.mapper.toBookEntity
+import com.example.vbook.data.db.mapper.toBookEntityList
 import com.example.vbook.data.parsers.KnigaVUheParser
-import com.example.vbook.data.repository.BookRepository.BookRepository
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.common.model.Book
 import com.example.vbook.isDetailed
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,6 +1,6 @@
 package com.example.vbook.data.parsers
 
-import com.example.vbook.presentation.model.Book
+import com.example.vbook.common.model.Book
 
 abstract class BooksParser {
     abstract val base_url: String

@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VBook">
         <service
-            android:name="com.example.vbook.presentation.service.mediaservice.MediaService"
+            android:name="com.example.vbook.service.mediaservice.MediaService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
