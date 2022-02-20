@@ -7,7 +7,7 @@ import com.example.vbook.data.db.model.DownloadingItemEntity
 @Dao
 @TypeConverters(TypeConvertor::class)
 interface MediaItemDownloadDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(downloadEntity: DownloadingItemEntity)
 
     @Update
@@ -22,6 +22,6 @@ interface MediaItemDownloadDAO {
     @Query("SELECT * FROM MediaItemDownloadEntity WHERE bookUrl =:url")
     suspend fun getDownloadsByBookUri(url:String): List<DownloadingItemEntity>
 
-    @Query("SELECT * FROM MediaItemDownloadEntity WHERE mediaUri =:downloadId")
+    @Query("SELECT * FROM MediaItemDownloadEntity WHERE downloadId =:downloadId")
     suspend fun getDownloadsByDownloadId(downloadId:Long): DownloadingItemEntity?
 }

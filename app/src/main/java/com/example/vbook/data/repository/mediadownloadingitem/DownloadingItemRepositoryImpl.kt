@@ -4,14 +4,22 @@ import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.DownloadingItem
 import com.example.vbook.data.db.AppDatabase
 import com.example.vbook.data.db.model.DownloadingItemEntity
+import toData
 import toDomain
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class DownloadingItemRepositoryImpl @Inject constructor(
     val db:AppDatabase
 ):DownloadingItemRepository{
+    override suspend fun createDownloadingItem(downloadingItem: DownloadingItem) {
+        return db.mediaItemDownloadDAO().insert(downloadingItem.toData())
+    }
+
     override suspend fun getMediaItemDownloadsByBookUrl(url: String): ResourceState<List<DownloadingItem>> {
         val downloadEntities = db.mediaItemDownloadDAO().getDownloadsByBookUri(url)
+        if (downloadEntities.isEmpty()) return ResourceState.Empty
         return ResourceState.Success(downloadEntities.toDomain())
     }
 

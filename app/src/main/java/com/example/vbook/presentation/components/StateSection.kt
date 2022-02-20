@@ -1,5 +1,6 @@
 package com.example.vbook.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +39,7 @@ fun <T> StateSection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                Log.e("VBook",state.message)
                 Text( text = state.message)
             }
 

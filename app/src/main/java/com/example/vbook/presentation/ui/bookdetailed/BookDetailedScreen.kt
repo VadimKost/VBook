@@ -1,19 +1,28 @@
 package com.example.vbook.presentation.ui.bookdetailed
 
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
 import com.example.vbook.toTime
 import com.example.vbook.presentation.components.StateSection
@@ -31,8 +40,12 @@ fun BookDetailedScreen(
             vm.playbackMetadata.collectAsState(initial = MediaPlayerManager.PlaybackInfo()).value
         val player = vm.player
 
+        val downloadsStatusState = vm.downloadsState.collectAsState().value
+
         BookDetailedBody(
             book = book,
+            downloadsStatusState = downloadsStatusState,
+            onDownload = vm::onDownload,
             trackIndex = playbackInfo.trackIndex,
             trackTime = playbackInfo.trackTime,
             hasNext = playbackInfo.hasNext,
@@ -54,6 +67,8 @@ fun BookDetailedScreen(
 @Composable
 fun BookDetailedBody(
     book: Book,
+    downloadsStatusState: ResourceState<Map<String, ResourceState<Unit>>>,
+    onDownload: (String,Book) -> Unit = { _,_ -> },
     trackIndex: Int,
     trackTime: Pair<Long, Long>,
     isPlaying: Boolean,
@@ -66,6 +81,9 @@ fun BookDetailedBody(
     onPrevious: () -> Unit = {},
     onSeek: (Long) -> Unit
 ) {
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,6 +102,16 @@ fun BookDetailedBody(
                 .fillMaxSize()
                 .weight(3f)
         )
+        Button(onClick = { showDialog = true }) {
+            DownloadingDialog(
+                showDialog = showDialog,
+                onClose = { showDialog = false },
+                onDownload = onDownload,
+                book = book,
+                downloadsStatusState = downloadsStatusState
+            )
+        }
+
         Text(
             text = book.mp3List!![trackIndex].first +
                     "(${trackIndex + 1} из ${book.mp3List!!.size})",
@@ -179,6 +207,45 @@ fun PlayerController(
         }
     }
 
+
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun DownloadingDialog(
+    showDialog: Boolean,
+    downloadsStatusState: ResourceState<Map<String, ResourceState<Unit>>>,
+    onDownload: (String,Book) -> Unit,
+    book: Book,
+    onClose: () -> Unit
+) {
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = onClose,
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            Surface(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize(),
+                shape = RoundedCornerShape(16.dp),
+                color = Color.LightGray
+            ) {
+                StateSection(state = downloadsStatusState) { downloadsStatus ->
+                    LazyColumn(Modifier.fillMaxSize()) {
+                        items(downloadsStatus.size) { index ->
+                            val status = downloadsStatus.getValue(book.mp3List!![index].second)
+                            Text(text = status.toString(), modifier = Modifier.clickable {
+                                onDownload(book.mp3List!![index].second,book)
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }
 

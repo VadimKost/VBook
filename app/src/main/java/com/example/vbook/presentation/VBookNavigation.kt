@@ -36,7 +36,7 @@ fun VBookNavHost(
         ) {
             val vm = hiltViewModel<BookDetailedVM>()
             val bookUrl = it.arguments?.getString("bookUrl")
-            vm.bindToMediaService(bookUrl!!)
+            vm.init(bookUrl!!)
             BookDetailedScreen(vm, navController)
         }
     }
