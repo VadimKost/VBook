@@ -3,7 +3,7 @@ package com.example.vbook.data.db.mapper
 import com.example.vbook.data.db.model.BookEntity
 import com.example.vbook.common.model.Book
 
-fun Book.toBookEntity()= BookEntity(
+fun Book.mapToData() = BookEntity(
     source,
     bookURL,
     title,
@@ -19,9 +19,9 @@ fun Book.toBookEntity()= BookEntity(
     stoppedTrackTime
 )
 
-fun List<Book>.toBookEntityList() = this.map { it.toBookEntity() }
+fun List<Book>.mapToData() = this.map { it.mapToData() }
 
-fun BookEntity.toBook()= Book(
+fun BookEntity.mapToDomain() = Book(
     source,
     bookURL,
     title,
@@ -37,5 +37,5 @@ fun BookEntity.toBook()= Book(
     stoppedTrackTime
 )
 
-fun List<BookEntity>.toBookList() = this.map { it.toBook() }
+fun List<BookEntity>.mapToDomain() = this.map { it.mapToDomain() }
 
