@@ -72,9 +72,11 @@ class BookDetailedVM @Inject constructor(
             Log.e("Sosi","almost updated1")
             if (downloadingItem is ResourceState.Success) {
                 Log.e("Sosi","almost updated")
+                Log.e("Sosi","Old ${downloadsState.data.toMutableMap()}")
                 val mutableDownloadsState = downloadsState.data.toMutableMap()
-                mutableDownloadsState[downloadingItem.data.bookUrl] =
+                mutableDownloadsState[downloadingItem.data.mediaOnlineUri] =
                     mediaDownloadManager.getDownloadState(downloadingItem.data.downloadId)
+                Log.e("Sosi","New ${mutableDownloadsState}")
                 setDownloadsStatus(mutableDownloadsState)
             }
         }

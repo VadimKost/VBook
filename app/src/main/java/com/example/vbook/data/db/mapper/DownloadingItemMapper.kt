@@ -8,7 +8,7 @@ fun DownloadingItem.toData() = DownloadingItemEntity(
 fun List<DownloadingItem>.toData() = this.map { it.toData() }
 
 fun DownloadingItemEntity.toDomain() = DownloadingItem(
-    mediaUri, downloadId, bookUrl
+    mediaOnlineUri, downloadId, bookUrl
 )
 
 fun List<DownloadingItemEntity>.toDomain() = this.map { it.toDomain() }

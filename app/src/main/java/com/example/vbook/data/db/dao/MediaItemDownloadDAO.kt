@@ -16,7 +16,7 @@ interface MediaItemDownloadDAO {
     @Query("SELECT * FROM MediaItemDownloadEntity")
     suspend fun getAllDownloads(): List<DownloadingItemEntity>
 
-    @Query("SELECT * FROM MediaItemDownloadEntity WHERE mediaUri =:uri")
+    @Query("SELECT * FROM MediaItemDownloadEntity WHERE mediaOnlineUri =:uri")
     suspend fun getDownloadByUri(uri:String): DownloadingItemEntity
 
     @Query("SELECT * FROM MediaItemDownloadEntity WHERE bookUrl =:url")
