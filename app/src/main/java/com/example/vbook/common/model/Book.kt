@@ -7,7 +7,7 @@ data class Book(
     var author:Pair<String,String>,
     var reader:Pair<String,String>,
     var coverURL:String,
-    var mp3List: List<Pair<String,String>>?=null,
+    var mediaItems: List<Pair<String,String>>?=null,
     val cycle:Pair<String,String>,
     var cycleBookList: List<Pair<String,String>>?=null,
     var duration: String?=null,

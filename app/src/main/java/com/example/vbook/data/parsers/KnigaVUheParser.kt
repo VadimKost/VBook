@@ -40,7 +40,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         for(i in list){
             mp3List.add(i.title to i.url)
         }
-        book.mp3List=mp3List
+        book.mediaItems=mp3List
         Log.e("getBookDetailedPar",book.toString())
         return book
     }

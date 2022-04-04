@@ -45,7 +45,7 @@ class NewBooksVM @Inject constructor(
                 }
                 is ResourceState.Error -> {
                     _canBeRefreshed.value = true
-                    _booksState.value = ResourceState.Error("Something went wrong")
+                    _booksState.value = ResourceState.Error(books.message)
                 }
             }
         }

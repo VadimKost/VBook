@@ -1,4 +1,4 @@
-package com.example.vbook.service.mediaservice
+package com.example.vbook.presentation.service.mediaservice
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -11,6 +11,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.vbook.data.repository.book.BookRepository
 import com.example.vbook.common.model.Book
+import com.example.vbook.data.repository.mediadownloadingitem.DownloadingItemRepository
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
@@ -35,6 +36,9 @@ class MediaService : Service() {
     @Inject
     lateinit var bookRepository: BookRepository
 
+    @Inject
+    lateinit var downloadingItemRepository: DownloadingItemRepository
+
 
     private val _serviceBook = MutableStateFlow<Book?>(null)
     val serviceBook = _serviceBook.asStateFlow()
@@ -42,7 +46,7 @@ class MediaService : Service() {
     private lateinit var mediaSessionConnector: MediaSessionConnector
     private lateinit var mediaSession: MediaSessionCompat
 
-    lateinit var playbackInfo:Flow<MediaPlayerManager.PlaybackInfo>
+    lateinit var playbackInfo: Flow<MediaPlayerManager.PlaybackInfo>
 
     override fun onCreate() {
         Log.e("VVV", "onCreate")
@@ -70,17 +74,15 @@ class MediaService : Service() {
 
         mediaPlayerManager = MediaPlayerManager(
             player,
-            serviceCoroutineScope,
-            bookRepository::updateBook,
-            PlayerEventListener()
+            PlayerEventListener(),
+            downloadingItemRepository
         )
         playbackInfo = mediaPlayerManager.playbackInfo
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.e("VVV", "onDestroy")
-        mediaPlayerManager.saveBookStoppedIndexAndTime(_serviceBook.value)
+        saveBookStoppedIndexAndTime(_serviceBook.value)
         mediaSession.release()
         player.release()
         serviceCoroutineScope.cancel()
@@ -97,12 +99,41 @@ class MediaService : Service() {
     suspend fun setBook(book: Book) {
         val oldBook = _serviceBook.value
         if (oldBook != book) {
-            mediaPlayerManager.preparePlayListForPlayer(book,oldBook)
+            saveBookStoppedIndexAndTime(oldBook)
+            mediaPlayerManager.preparePlayListForPlayer(book)
             _serviceBook.value = book
             mediaNotificationManager.showNotificationForPlayer(player)
 
         }
 
+    }
+
+    suspend fun replaceMediaItem(
+        mediaUri: String,
+        title: String,
+        author: String,
+        artworkUri: String,
+        index: Int
+    ) {
+        mediaPlayerManager.replaceMediaItem(mediaUri, title, author, artworkUri, index)
+    }
+
+    private fun saveBookStoppedIndexAndTime(book: Book?) {
+        serviceCoroutineScope.launch {
+            if (book != null) {
+                withContext(Dispatchers.Main) {
+                    Log.d(
+                        "BookSet",
+                        "${book.title} i= ${player.currentMediaItemIndex} t = ${player.contentPosition}"
+                    )
+                    book.stoppedTrackIndex = player.currentMediaItemIndex
+                    book.stoppedTrackTime = player.currentPosition
+                }
+                withContext(Dispatchers.IO) {
+                    bookRepository.updateBook(book)
+                }
+            }
+        }
     }
 
 
@@ -118,7 +149,7 @@ class MediaService : Service() {
                 isForegroundService = false
                 mediaPlayerManager.updatePlayListStateInfo()
                 Log.d("Book", "stop")
-                mediaPlayerManager.saveBookStoppedIndexAndTime(_serviceBook.value,)
+                saveBookStoppedIndexAndTime(_serviceBook.value)
             } else {
                 mediaPlayerManager.updatePlayListStateInfo()
             }

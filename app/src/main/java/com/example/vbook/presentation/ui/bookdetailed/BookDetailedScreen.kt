@@ -26,14 +26,18 @@ import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
 import com.example.vbook.toTime
 import com.example.vbook.presentation.components.StateSection
-import com.example.vbook.service.mediaservice.MediaPlayerManager
+import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.example.vbook.toSliderFloat
 
 @Composable
 fun BookDetailedScreen(
     vm: BookDetailedVM,
+    bookUrl:String,
     navController: NavController
 ) {
+    LaunchedEffect(bookUrl) {
+        vm.init(bookUrl)
+    }
     val bookState = vm.bookState.collectAsState()
     StateSection(state = bookState.value) { book ->
         val playbackInfo =
@@ -59,8 +63,6 @@ fun BookDetailedScreen(
             onSeek = { player.seekTo(it) }
         )
     }
-
-
 }
 
 
@@ -113,8 +115,8 @@ fun BookDetailedBody(
         }
 
         Text(
-            text = book.mp3List!![trackIndex].first +
-                    "(${trackIndex + 1} из ${book.mp3List!!.size})",
+            text = book.mediaItems!![trackIndex].first +
+                    "(${trackIndex + 1} из ${book.mediaItems!!.size})",
             modifier = Modifier.weight(1f)
         )
         PlayerController(
@@ -236,9 +238,9 @@ fun DownloadingDialog(
                 StateSection(state = downloadsStatusState) { downloadsStatus ->
                     LazyColumn(Modifier.fillMaxSize()) {
                         items(downloadsStatus.size) { index ->
-                            val status = downloadsStatus.getValue(book.mp3List!![index].second)
+                            val status = downloadsStatus.getValue(book.mediaItems!![index].second)
                             Text(text = status.toString(), modifier = Modifier.clickable {
-                                onDownload(book.mp3List!![index].second,book)
+                                onDownload(book.mediaItems!![index].second,book)
                             })
                         }
                     }

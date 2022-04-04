@@ -24,7 +24,7 @@ class BookRepositoryImpl @Inject constructor(
             if (books.isEmpty()) return ResourceState.Empty
             return ResourceState.Success(books)
         } catch (t: Throwable) {
-            return ResourceState.Error(t.toString())
+            return ResourceState.Error(t.toString()+" fetchNewBooks")
         }
     }
 
@@ -45,7 +45,7 @@ class BookRepositoryImpl @Inject constructor(
                 return ResourceState.Empty
             }
         } catch (t: Throwable) {
-            return ResourceState.Error(t.toString())
+            return ResourceState.Error(t.toString() +" getFilledBook")
         }
 
     }
