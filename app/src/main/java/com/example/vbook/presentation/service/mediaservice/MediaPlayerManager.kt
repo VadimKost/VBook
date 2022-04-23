@@ -2,7 +2,7 @@ package com.example.vbook.presentation.service.mediaservice
 
 import android.net.Uri
 import com.example.vbook.common.model.Book
-import com.example.vbook.data.repository.mediadownloadingitem.DownloadingItemRepository
+import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata

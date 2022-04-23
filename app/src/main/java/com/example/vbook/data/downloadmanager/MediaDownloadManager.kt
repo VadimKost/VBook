@@ -3,12 +3,10 @@ package com.example.vbook.data.downloadmanager
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
-import com.example.vbook.common.model.DownloadingItem
 import com.example.vbook.data.repository.book.BookRepository
-import com.example.vbook.data.repository.mediadownloadingitem.DownloadingItemRepository
+import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,6 +18,7 @@ class MediaDownloadManager @Inject constructor(
     @ApplicationContext val context: Context
 ) {
     // TODO: Add download queue
+    // TODO: Use download state instead of resourceState
 
     fun initiateDownload(uri: String, book: Book): Long {
         val downloadRequest = createDownloadRequest(Uri.parse(uri), book.title)

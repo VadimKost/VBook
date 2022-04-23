@@ -1,4 +1,4 @@
-package com.example.vbook.data.repository.mediadownloadingitem
+package com.example.vbook.data.repository.mediaitem
 
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book

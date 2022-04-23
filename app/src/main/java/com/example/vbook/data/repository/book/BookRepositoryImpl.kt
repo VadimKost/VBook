@@ -33,16 +33,16 @@ class BookRepositoryImpl @Inject constructor(
     ): ResourceState<Book> {
         try {
             val book = DB.bookDao().getBook(bookUrl)?.mapToDomain()
-            if (book != null) {
+            return if (book != null) {
                 if (book.isDetailed()) {
-                    return ResourceState.Success(book)
+                    ResourceState.Success(book)
                 } else {
                     val bookDetailed = knigaVUheParser.getFilledBook(book)
                     updateBook(book)
-                    return ResourceState.Success(bookDetailed)
+                    ResourceState.Success(bookDetailed)
                 }
             } else {
-                return ResourceState.Empty
+                ResourceState.Empty
             }
         } catch (t: Throwable) {
             return ResourceState.Error(t.toString() +" getFilledBook")

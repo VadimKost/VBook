@@ -11,7 +11,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.vbook.data.repository.book.BookRepository
 import com.example.vbook.common.model.Book
-import com.example.vbook.data.repository.mediadownloadingitem.DownloadingItemRepository
+import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
@@ -82,6 +82,7 @@ class MediaService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.e("VVV", "onDestroy")
         saveBookStoppedIndexAndTime(_serviceBook.value)
         mediaSession.release()
         player.release()

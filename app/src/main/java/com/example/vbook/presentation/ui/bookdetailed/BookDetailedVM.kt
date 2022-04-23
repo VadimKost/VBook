@@ -3,6 +3,15 @@ package com.example.vbook.presentation.ui.bookdetailed
 import android.app.DownloadManager
 import android.content.*
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material.icons.filled.DownloadForOffline
+import androidx.compose.material.icons.filled.Downloading
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vbook.bindService
@@ -13,7 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
-import com.example.vbook.data.repository.mediadownloadingitem.DownloadingItemRepository
+import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
+import com.example.vbook.isSuccess
 import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.google.android.exoplayer2.ExoPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -88,26 +98,48 @@ class BookDetailedVM @Inject constructor(
         }
     }
 
-    fun onDownload(uri: String, book: Book) {
-        viewModelScope.launch {
-            downloadingItemRepository.createDownloadingItem(uri, book)
+    fun onDownloadClick(uri: String, book: Book) {
+        val downloadingStatus = downloadsState.value
+        if (downloadingStatus is ResourceState.Success) {
+            when (downloadingStatus.data.get(uri)) {
+                is ResourceState.Empty -> {
+                    viewModelScope.launch {
+                        downloadingItemRepository.createDownloadingItem(uri, book)
+                        val newStatuses =
+                            downloadingStatus.data.toMutableMap()
+                        newStatuses[uri] = ResourceState.Loading
+                        _downloadsState.value = ResourceState.Success(newStatuses)
+                    }
+                }
+                is ResourceState.Loading -> {
+                    Toast.makeText(context, "Fake Cancel", Toast.LENGTH_SHORT).show()
+                }
+                is ResourceState.Success<Unit> -> {
+                    Toast.makeText(context, "Fake Delete", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+
     }
 
     fun init(bookUrl: String) {
-        val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-        context.registerReceiver(broadcastReceiver, intentFilter)
         viewModelScope.launch(Dispatchers.IO) {
             when (val book = bookRepository.getFilledBook(bookUrl)) {
                 is ResourceState.Success -> {
                     withContext(Dispatchers.Main) {
                         setDownloadsStatus(getInitialDownloadsStatus(book.data))
+                        registerBroadcastReceiver()
                         bindBookToMediaService(book.data)
                     }
                 }
                 is ResourceState.Error -> _bookState.value = ResourceState.Error(book.message)
             }
         }
+    }
+
+    fun registerBroadcastReceiver() {
+        val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        context.registerReceiver(broadcastReceiver, intentFilter)
     }
 
     private suspend fun bindBookToMediaService(book: Book) {
