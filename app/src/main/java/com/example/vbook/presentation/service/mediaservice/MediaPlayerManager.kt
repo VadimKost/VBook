@@ -46,7 +46,7 @@ class MediaPlayerManager(
 
     fun updatePlayListStateInfo() {
         _trackIndex.value = player.currentWindowIndex
-        _isPlaying.value = player.playWhenReady
+        _isPlaying.value = player.isPlaying
         _hasNext.value = player.hasNextMediaItem()
     }
 
@@ -74,8 +74,7 @@ class MediaPlayerManager(
         player.removeMediaItem(index)
         player.addMediaItem(index, getMediaItem(mediaUri, title, author, artworkUri, index))
         player.seekTo(trackIndex, position)
-
-        player.play()
+        if (player.isPlaying) player.play()
     }
 
     private suspend fun getMediaItemList(book: Book): List<MediaItem> {
