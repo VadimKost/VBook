@@ -7,8 +7,8 @@ import com.example.vbook.common.model.DownloadingItem
 interface DownloadingItemRepository {
     suspend fun createDownloadingItem(uri: String,book: Book)
 
-    fun getDownloadStatus(downloadId: Long): ResourceState<Unit>
-    suspend fun getBookDownloadingItemsStatus(book: Book): Map<String, ResourceState<Unit>>
+    fun getDownloadStatus(downloadId: Long): DownloadingItem.Status
+    suspend fun getBookDownloadingItemsStatus(book: Book): Map<String, DownloadingItem.Status>
 
     suspend fun getMediaItemDownloadsByBookUrl(url: String): ResourceState<List<DownloadingItem>>
     suspend fun getMediaItemDownloadByDownloadId(downloadId: Long): ResourceState<DownloadingItem>

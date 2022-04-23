@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
+import com.example.vbook.common.model.DownloadingItem
 import com.example.vbook.toTime
 import com.example.vbook.presentation.components.StateSection
 import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
@@ -70,7 +71,7 @@ fun BookDetailedScreen(
 @Composable
 fun BookDetailedBody(
     book: Book,
-    downloadsStatusState: ResourceState<Map<String, ResourceState<Unit>>>,
+    downloadsStatusState: ResourceState<Map<String, DownloadingItem.Status>>,
     onDownloadClick: (String, Book) -> Unit = { _, _ -> },
     trackIndex: Int,
     trackTime: Pair<Long, Long>,
@@ -227,7 +228,7 @@ fun PlayerController(
 @Composable
 fun DownloadingDialog(
     showDialog: Boolean,
-    downloadsStatusState: ResourceState<Map<String, ResourceState<Unit>>>,
+    downloadsStatusState: ResourceState<Map<String, DownloadingItem.Status>>,
     onDownloadClick: (String, Book) -> Unit,
     book: Book,
     onClose: () -> Unit
@@ -267,7 +268,7 @@ fun DownloadingDialog(
 fun DownloadingItem(
     book: Book,
     index: Int,
-    downloadsStatus: Map<String, ResourceState<Unit>>,
+    downloadsStatus: Map<String, DownloadingItem.Status>,
     onDownloadClick: (String, Book) -> Unit,
 ) {
     val downloadingItemTitle = book.mediaItems!![index].first
@@ -286,7 +287,7 @@ fun DownloadingItem(
         ) {
             Text(text = downloadingItemTitle, modifier = Modifier.weight(9f))
             when (status) {
-                is ResourceState.Empty -> {
+                DownloadingItem.Status.EMPTY -> {
                     Icon(
                         imageVector = Icons.Default.DownloadForOffline,
                         contentDescription = null,
@@ -297,7 +298,7 @@ fun DownloadingItem(
                             .padding(4.dp)
                     )
                 }
-                is ResourceState.Loading -> {
+                DownloadingItem.Status.DOWNLOADING -> {
                     Icon(
                         imageVector = Icons.Default.Downloading,
                         contentDescription = null,
@@ -308,7 +309,7 @@ fun DownloadingItem(
                             .padding(4.dp)
                     )
                 }
-                is ResourceState.Success<Unit> -> {
+                DownloadingItem.Status.SUCCESS -> {
                     Icon(
                         imageVector = Icons.Default.DownloadDone,
                         contentDescription = null,

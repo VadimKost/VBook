@@ -23,17 +23,17 @@ class DownloadingItemRepositoryImpl @Inject constructor(
         return db.mediaItemDownloadDAO().insert(download.toData())
     }
 
-    override fun getDownloadStatus(downloadId: Long): ResourceState<Unit> =
+    override fun getDownloadStatus(downloadId: Long): DownloadingItem.Status =
         mediaDownloadManager.getDownloadStatus(downloadId)
 
-    override suspend fun getBookDownloadingItemsStatus(book: Book): Map<String, ResourceState<Unit>> {
+    override suspend fun getBookDownloadingItemsStatus(book: Book): Map<String, DownloadingItem.Status> {
         val mediaUrls = book.mediaItems!!.map { it.second }
-        val status = mutableMapOf<String, ResourceState<Unit>>()
+        val status = mutableMapOf<String, DownloadingItem.Status>()
         val downloadingItems = getMediaItemDownloadsByBookUrl(book.bookURL)
         when (downloadingItems) {
             is ResourceState.Empty -> {
                 mediaUrls.forEach { mediaUrl ->
-                    status[mediaUrl] = ResourceState.Empty
+                    status[mediaUrl] = DownloadingItem.Status.EMPTY
                 }
                 return status
             }
@@ -43,13 +43,13 @@ class DownloadingItemRepositoryImpl @Inject constructor(
                         val downloadingItem =
                             downloadingItems.data.first { it.mediaOnlineUri == mediaUrl }
                         if (mediaDownloadManager.hasLocalCopy(downloadingItem.downloadId)) {
-                            status[mediaUrl] = ResourceState.Success(Unit)
+                            status[mediaUrl] = DownloadingItem.Status.SUCCESS
                         } else {
                             val downloadingState = getDownloadStatus(downloadingItem.downloadId)
                             status[mediaUrl] = downloadingState
                         }
                     }else{
-                        status[mediaUrl] = ResourceState.Empty
+                        status[mediaUrl] = DownloadingItem.Status.EMPTY
                     }
 
                 }

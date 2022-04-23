@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.DownloadForOffline
 import androidx.compose.material.icons.filled.Downloading
+import androidx.compose.runtime.Composer.Companion.Empty
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
+import com.example.vbook.common.model.DownloadingItem
 import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
 import com.example.vbook.isSuccess
 import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
@@ -48,7 +50,7 @@ class BookDetailedVM @Inject constructor(
         MutableStateFlow(ResourceState.Loading)
     val bookState = _bookState.asStateFlow()
 
-    private val _downloadsState: MutableStateFlow<ResourceState<Map<String, ResourceState<Unit>>>> =
+    private val _downloadsState: MutableStateFlow<ResourceState<Map<String, DownloadingItem.Status>>> =
         MutableStateFlow(ResourceState.Loading)
     val downloadsState = _downloadsState.asStateFlow()
 
@@ -101,20 +103,20 @@ class BookDetailedVM @Inject constructor(
     fun onDownloadClick(uri: String, book: Book) {
         val downloadingStatus = downloadsState.value
         if (downloadingStatus is ResourceState.Success) {
-            when (downloadingStatus.data.get(uri)) {
-                is ResourceState.Empty -> {
+            when (downloadingStatus.data[uri]) {
+                DownloadingItem.Status.EMPTY -> {
                     viewModelScope.launch {
                         downloadingItemRepository.createDownloadingItem(uri, book)
                         val newStatuses =
                             downloadingStatus.data.toMutableMap()
-                        newStatuses[uri] = ResourceState.Loading
+                        newStatuses[uri] = DownloadingItem.Status.DOWNLOADING
                         _downloadsState.value = ResourceState.Success(newStatuses)
                     }
                 }
-                is ResourceState.Loading -> {
+                DownloadingItem.Status.DOWNLOADING -> {
                     Toast.makeText(context, "Fake Cancel", Toast.LENGTH_SHORT).show()
                 }
-                is ResourceState.Success<Unit> -> {
+                DownloadingItem.Status.SUCCESS -> {
                     Toast.makeText(context, "Fake Delete", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -154,11 +156,11 @@ class BookDetailedVM @Inject constructor(
         _bookState.value = ResourceState.Success(book)
     }
 
-    private fun setDownloadsStatus(statuses: Map<String, ResourceState<Unit>>) {
+    private fun setDownloadsStatus(statuses: Map<String, DownloadingItem.Status>) {
         _downloadsState.value = ResourceState.Success(statuses)
     }
 
-    private suspend fun getInitialDownloadsStatus(book: Book): Map<String, ResourceState<Unit>> =
+    private suspend fun getInitialDownloadsStatus(book: Book): Map<String, DownloadingItem.Status> =
         downloadingItemRepository.getBookDownloadingItemsStatus(book)
 
 
