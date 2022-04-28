@@ -1,5 +1,6 @@
 package com.example.vbook.data.repository.book
 
+import android.util.Log
 import com.example.vbook.common.ResourceState
 import com.example.vbook.data.db.AppDatabase
 import com.example.vbook.data.parsers.KnigaVUheParser
@@ -24,7 +25,21 @@ class BookRepositoryImpl @Inject constructor(
             if (books.isEmpty()) return ResourceState.Empty
             return ResourceState.Success(books)
         } catch (t: Throwable) {
-            return ResourceState.Error(t.toString()+" fetchNewBooks")
+            Log.e("BookError",t.stackTraceToString())
+            return ResourceState.Error(t.toString() +" fetchNewBooks")
+        }
+    }
+
+    override suspend fun searchBooks(value: String, page: Int): ResourceState<List<Book>> {
+        try {
+            val books = knigaVUheParser.search(value, page)
+            val booksEntity = books.mapToData()
+            DB.bookDao().insert(booksEntity)
+            if (books.isEmpty()) return ResourceState.Empty
+            return ResourceState.Success(books)
+        } catch (t: Throwable) {
+            Log.e("BookError",t.stackTraceToString())
+            return ResourceState.Error(t.toString() +" searchBooks")
         }
     }
 

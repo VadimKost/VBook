@@ -1,17 +1,13 @@
-package com.example.vbook.presentation.ui.newbooks
+package com.example.vbook.presentation.ui.searchedbook
 
-import android.app.DownloadManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.vbook.data.repository.book.BookRepository
-import com.example.vbook.common.model.Book
 import com.example.vbook.common.ResourceState
-import com.example.vbook.presentation.VBookScreen
-import com.example.vbook.presentation.addArgs
-import com.example.vbook.presentation.addRouteArgs
-import com.example.vbook.presentation.components.appbar.AppBarVM
+import com.example.vbook.common.model.Book
+import com.example.vbook.data.repository.book.BookRepository
+import com.example.vbook.presentation.ui.newbooks.NewBooksVM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -21,28 +17,28 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-open class NewBooksVM @Inject constructor(
+class SearchedBookVM @Inject constructor(
     val bookRepository: BookRepository
 ) : ViewModel() {
-    init {
-        loadMoreNewBooks()
+    fun init(query:String) {
+        loadMoreNewBooks(query)
     }
 
-    val _booksState = MutableStateFlow<ResourceState<List<Book>>>(ResourceState.Loading)
+    private val _booksState = MutableStateFlow<ResourceState<List<Book>>>(ResourceState.Loading)
     val booksState = _booksState.asStateFlow()
 
-    val _isRefreshing = MutableStateFlow(false)
+    private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    val _canBeRefreshed = MutableStateFlow(false)
+    private val _canBeRefreshed = MutableStateFlow(false)
     val canBeRefreshed = _canBeRefreshed.asStateFlow()
 
-    var bookList = listOf<Book>()
-    var page = 1
+    private var bookList = listOf<Book>()
+    private var page = 1
 
-    fun loadMoreNewBooks() {
+    fun loadMoreNewBooks(value: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val books = bookRepository.fetchNewBooks(page)
+            val books = bookRepository.searchBooks(value,page)
             when (books) {
                 is ResourceState.Success -> {
                     page += 1
@@ -58,7 +54,7 @@ open class NewBooksVM @Inject constructor(
         }
     }
 
-    fun refresh() {
+    fun refresh(searchedText:String) {
         viewModelScope.launch {
             if (
                 _booksState.value is ResourceState.Error ||
@@ -66,7 +62,7 @@ open class NewBooksVM @Inject constructor(
             ) {
                 _isRefreshing.value = true
                 delay(2000L)
-                loadMoreNewBooks()
+                loadMoreNewBooks(searchedText)
                 _isRefreshing.value = false
             }
 

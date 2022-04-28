@@ -46,7 +46,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
     }
 
     override fun search(text: String, page: Int): List<Book> {
-        TODO("Not yet implemented")
+        return parseBookList("search/?q=$text&page=$page")
     }
 
     override fun parseBookList(URL: String): MutableList<Book> {

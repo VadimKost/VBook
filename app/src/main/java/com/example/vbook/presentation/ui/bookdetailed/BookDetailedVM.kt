@@ -26,6 +26,7 @@ import com.example.vbook.common.model.Book
 import com.example.vbook.common.model.DownloadingItem
 import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
 import com.example.vbook.isSuccess
+import com.example.vbook.presentation.components.appbar.AppBarVM
 import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.google.android.exoplayer2.ExoPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -42,7 +43,6 @@ class BookDetailedVM @Inject constructor(
     val downloadingItemRepository: DownloadingItemRepository,
     @ApplicationContext val context: Context
 ) : ViewModel() {
-
     private var _service: MediaService? = null
     private var _serviceConnection: ServiceConnection? = null
 

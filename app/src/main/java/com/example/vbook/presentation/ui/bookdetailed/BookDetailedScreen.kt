@@ -25,8 +25,10 @@ import coil.compose.rememberImagePainter
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
 import com.example.vbook.common.model.DownloadingItem
+import com.example.vbook.presentation.LocalAppBarVM
 import com.example.vbook.toTime
 import com.example.vbook.presentation.components.StateSection
+import com.example.vbook.presentation.components.appbar.AppBarVM
 import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.example.vbook.toSliderFloat
 
@@ -34,11 +36,16 @@ import com.example.vbook.toSliderFloat
 fun BookDetailedScreen(
     vm: BookDetailedVM,
     bookUrl: String,
-    navController: NavController
 ) {
-    Result
+    val appBarVM = LocalAppBarVM.current
     LaunchedEffect(bookUrl) {
         vm.init(bookUrl)
+    }
+    DisposableEffect(bookUrl){
+        appBarVM.apply {
+            setType(AppBarVM.Type.Default)
+        }
+        onDispose {}
     }
     val bookState = vm.bookState.collectAsState()
     StateSection(state = bookState.value) { book ->

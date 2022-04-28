@@ -67,14 +67,12 @@ class MediaPlayerManager(
         artworkUri: String,
         index: Int
     ) {
-        player.pause()
         val trackIndex = player.currentMediaItemIndex
         val position = player.currentPosition
 
         player.removeMediaItem(index)
         player.addMediaItem(index, getMediaItem(mediaUri, title, author, artworkUri, index))
         player.seekTo(trackIndex, position)
-        if (player.isPlaying) player.play()
     }
 
     private suspend fun getMediaItemList(book: Book): List<MediaItem> {
