@@ -3,19 +3,31 @@ package com.example.vbook.presentation.ui.bookdetailed
 import android.app.DownloadManager
 import android.content.*
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material.icons.filled.DownloadForOffline
+import androidx.compose.material.icons.filled.Downloading
+import androidx.compose.runtime.Composer.Companion.Empty
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vbook.bindService
 import com.example.vbook.data.repository.book.BookRepository
-import com.example.vbook.service.mediaservice.MediaService
+import com.example.vbook.presentation.service.mediaservice.MediaService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
-import com.example.vbook.data.repository.mediadownloadingitem.DownloadingItemRepository
-import com.example.vbook.downloadmanager.MediaDownloadManager
-import com.example.vbook.service.mediaservice.MediaPlayerManager
+import com.example.vbook.common.model.DownloadingItem
+import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
+import com.example.vbook.isSuccess
+import com.example.vbook.presentation.components.appbar.AppBarVM
+import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.google.android.exoplayer2.ExoPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -29,10 +41,8 @@ import javax.inject.Inject
 class BookDetailedVM @Inject constructor(
     val bookRepository: BookRepository,
     val downloadingItemRepository: DownloadingItemRepository,
-    val mediaDownloadManager: MediaDownloadManager,
     @ApplicationContext val context: Context
 ) : ViewModel() {
-
     private var _service: MediaService? = null
     private var _serviceConnection: ServiceConnection? = null
 
@@ -40,7 +50,7 @@ class BookDetailedVM @Inject constructor(
         MutableStateFlow(ResourceState.Loading)
     val bookState = _bookState.asStateFlow()
 
-    private val _downloadsState: MutableStateFlow<ResourceState<Map<String, ResourceState<Unit>>>> =
+    private val _downloadsState: MutableStateFlow<ResourceState<Map<String, DownloadingItem.Status>>> =
         MutableStateFlow(ResourceState.Loading)
     val downloadsState = _downloadsState.asStateFlow()
 
@@ -49,7 +59,6 @@ class BookDetailedVM @Inject constructor(
 
     val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Log.e("Offline","update")
             val deferred = goAsync()
             val downloadId = intent.getLongExtra(
                 DownloadManager.EXTRA_DOWNLOAD_ID, -1L
@@ -65,36 +74,64 @@ class BookDetailedVM @Inject constructor(
 
     private suspend fun onDownloadComplete(downloadId: Long) {
         val downloadingItem = downloadingItemRepository.getMediaItemDownloadByDownloadId(downloadId)
-        Log.e("Sosi", "$downloadingItem")
         val downloadsState = _downloadsState.value
-        Log.e("Sosi","almost update2 ${downloadId}")
         if (downloadsState is ResourceState.Success) {
-            Log.e("Sosi","almost updated1")
             if (downloadingItem is ResourceState.Success) {
-                Log.e("Sosi","almost updated")
                 val mutableDownloadsState = downloadsState.data.toMutableMap()
-                mutableDownloadsState[downloadingItem.data.bookUrl] =
-                    mediaDownloadManager.getDownloadState(downloadingItem.data.downloadId)
+                mutableDownloadsState[downloadingItem.data.mediaOnlineUri] =
+                    downloadingItemRepository.getDownloadStatus(downloadingItem.data.downloadId)
                 setDownloadsStatus(mutableDownloadsState)
+                val bookState = _bookState.value
+                if (bookState is ResourceState.Success) {
+                    val book = bookState.data
+                    val itemToReplace =
+                        book.mediaItems!!.first { downloadingItem.data.mediaOnlineUri == it.second }
+                    val indexToReplace = book.mediaItems!!.indexOf(itemToReplace)
+                    _service?.replaceMediaItem(
+                        itemToReplace.second,
+                        itemToReplace.first,
+                        book.author.first,
+                        book.coverURL,
+                        indexToReplace
+                    )
+                }
+
             }
         }
     }
 
-    fun onDownload(uri: String,book: Book){
-        viewModelScope.launch {
-            mediaDownloadManager.initiateDownload(uri, book)
+    fun onDownloadClick(uri: String, book: Book) {
+        val downloadingStatus = downloadsState.value
+        if (downloadingStatus is ResourceState.Success) {
+            when (downloadingStatus.data[uri]) {
+                DownloadingItem.Status.EMPTY -> {
+                    viewModelScope.launch {
+                        downloadingItemRepository.createDownloadingItem(uri, book)
+                        val newStatuses =
+                            downloadingStatus.data.toMutableMap()
+                        newStatuses[uri] = DownloadingItem.Status.DOWNLOADING
+                        _downloadsState.value = ResourceState.Success(newStatuses)
+                    }
+                }
+                DownloadingItem.Status.DOWNLOADING -> {
+                    Toast.makeText(context, "Fake Cancel", Toast.LENGTH_SHORT).show()
+                }
+                DownloadingItem.Status.SUCCESS -> {
+                    Toast.makeText(context, "Fake Delete", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+
     }
 
     fun init(bookUrl: String) {
-        val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-        context.registerReceiver(broadcastReceiver,intentFilter)
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             when (val book = bookRepository.getFilledBook(bookUrl)) {
                 is ResourceState.Success -> {
                     withContext(Dispatchers.Main) {
-                        bindBookToMediaService(book.data)
                         setDownloadsStatus(getInitialDownloadsStatus(book.data))
+                        registerBroadcastReceiver()
+                        bindBookToMediaService(book.data)
                     }
                 }
                 is ResourceState.Error -> _bookState.value = ResourceState.Error(book.message)
@@ -102,12 +139,16 @@ class BookDetailedVM @Inject constructor(
         }
     }
 
+    fun registerBroadcastReceiver() {
+        val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        context.registerReceiver(broadcastReceiver, intentFilter)
+    }
+
     private suspend fun bindBookToMediaService(book: Book) {
         val (service, connection) = bindService(context)
-        _service?.setBook(book)
-
         _service = service
         _serviceConnection = connection
+        _service?.setBook(book)
 
         playbackMetadata = service.playbackInfo
         player = service.player
@@ -115,40 +156,13 @@ class BookDetailedVM @Inject constructor(
         _bookState.value = ResourceState.Success(book)
     }
 
-    private fun setDownloadsStatus(statuses: Map<String, ResourceState<Unit>>) {
+    private fun setDownloadsStatus(statuses: Map<String, DownloadingItem.Status>) {
         _downloadsState.value = ResourceState.Success(statuses)
     }
 
-    private suspend fun getInitialDownloadsStatus(book: Book): Map<String, ResourceState<Unit>> {
-        val mediaUrls = book.mp3List!!.map { it.second }
-        val status = mutableMapOf<String, ResourceState<Unit>>()
-        val downloadingItems =
-            downloadingItemRepository.getMediaItemDownloadsByBookUrl(book.bookURL)
-        if (downloadingItems is ResourceState.Empty) {
-            mediaUrls.forEach { mediaUrl ->
-                status[mediaUrl] = ResourceState.Empty
-            }
-            return status
-        }
-        if (downloadingItems is ResourceState.Success) {
-            mediaUrls.forEach { mediaUrl ->
-                if (mediaDownloadManager.hasLocalCopy()) {
-                    status[mediaUrl] = ResourceState.Success(Unit)
-                } else {
-                    val downloadingItem =
-                        downloadingItems.data.filter { it.mediaOnlineUri == mediaUrl }
-                    if (downloadingItem.isEmpty()) status[mediaUrl] = ResourceState.Empty else{
-                        val downloadingState =
-                            mediaDownloadManager.getDownloadState(downloadingItem.first().downloadId)
-                        status[mediaUrl] = downloadingState
-                    }
+    private suspend fun getInitialDownloadsStatus(book: Book): Map<String, DownloadingItem.Status> =
+        downloadingItemRepository.getBookDownloadingItemsStatus(book)
 
-                }
-            }
-            return status
-        }
-        return status
-    }
 
     override fun onCleared() {
         super.onCleared()

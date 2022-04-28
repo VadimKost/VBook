@@ -6,6 +6,6 @@ data class DownloadingItem(
     var bookUrl:String
 ){
     enum class Status{
-        DOWNLOADING,STOPPED,ERROR,SUCCESS
+        DOWNLOADING,STOPPED,FAILED,SUCCESS,EMPTY
     }
 }

@@ -16,7 +16,7 @@ data class BookEntity(
     @ColumnInfo(name = "author") var author:Pair<String,String>,
     @ColumnInfo(name = "reader") var reader:Pair<String,String>,
     @ColumnInfo(name = "coverURL") var coverURL:String,
-    @ColumnInfo(name = "mp3List") var mp3List: List<Pair<String,String>>?=null,
+    @ColumnInfo(name = "mp3List") var mediaItems: List<Pair<String,String>>?=null,
     @ColumnInfo(name = "cycle") val cycle:Pair<String,String>,
     @ColumnInfo(name = "cycleBookList") var cycleBookList: List<Pair<String,String>>?=null,
     @ColumnInfo(name = "duration") var duration: String?=null,
@@ -24,5 +24,5 @@ data class BookEntity(
     @ColumnInfo(name = "stoppedTrackIndex")var stoppedTrackIndex:Int,
     @ColumnInfo(name = "stoppedTrackTime")var stoppedTrackTime:Long,
 
-)
+    )
 

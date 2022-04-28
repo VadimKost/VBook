@@ -6,6 +6,8 @@ import com.example.vbook.common.model.Book
 interface BookRepository {
     suspend fun fetchNewBooks(page:Int): ResourceState<List<Book>>
 
+    suspend fun searchBooks(value:String,page: Int): ResourceState<List<Book>>
+
     suspend fun getCurrentBook(): ResourceState<Book>
 
     suspend fun updateBook(book: Book):Boolean

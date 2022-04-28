@@ -12,6 +12,9 @@ import com.example.vbook.presentation.ui.bookdetailed.BookDetailedScreen
 import com.example.vbook.presentation.ui.bookdetailed.BookDetailedVM
 import com.example.vbook.presentation.ui.newbooks.NewBooksScreen
 import com.example.vbook.presentation.ui.newbooks.NewBooksVM
+import com.example.vbook.presentation.ui.searchedbook.SearchedBookVM
+import com.example.vbook.presentation.ui.searchedbook.SearchedBooksScreen
+
 
 @Composable
 fun VBookNavHost(
@@ -25,10 +28,10 @@ fun VBookNavHost(
     ) {
         composable(VBookScreen.NewBooks.name) {
             val vm = hiltViewModel<NewBooksVM>()
-            NewBooksScreen(vm, navController)
+            NewBooksScreen(vm)
         }
         composable(
-            VBookScreen.BookDetailed.name.addPathArgs("bookUrl"),
+            VBookScreen.BookDetailed.name.addRouteArgs("bookUrl"),
             arguments = listOf(navArgument("bookUrl") {
                 type = NavType.StringType
                 nullable = true
@@ -36,8 +39,18 @@ fun VBookNavHost(
         ) {
             val vm = hiltViewModel<BookDetailedVM>()
             val bookUrl = it.arguments?.getString("bookUrl")
-            vm.init(bookUrl!!)
-            BookDetailedScreen(vm, navController)
+            val appBarVM = LocalAppBarVM.current
+            BookDetailedScreen(vm, bookUrl!!)
+        }
+        composable(
+            VBookScreen.SearchedBook.name.addRouteArgs("query"),
+            arguments = listOf(navArgument("bookUrl"){
+                type = NavType.StringType
+                nullable = true
+            })
+        ){
+            val query = it.arguments?.getString("query")
+            SearchedBooksScreen(query = query!!)
         }
     }
 }

@@ -40,13 +40,13 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         for(i in list){
             mp3List.add(i.title to i.url)
         }
-        book.mp3List=mp3List
+        book.mediaItems=mp3List
         Log.e("getBookDetailedPar",book.toString())
         return book
     }
 
     override fun search(text: String, page: Int): List<Book> {
-        TODO("Not yet implemented")
+        return parseBookList("search/?q=$text&page=$page")
     }
 
     override fun parseBookList(URL: String): MutableList<Book> {

@@ -1,6 +1,6 @@
 package com.example.vbook.presentation.ui.bookdetailed
 
-import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,16 +24,29 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
+import com.example.vbook.common.model.DownloadingItem
+import com.example.vbook.presentation.LocalAppBarVM
 import com.example.vbook.toTime
 import com.example.vbook.presentation.components.StateSection
-import com.example.vbook.service.mediaservice.MediaPlayerManager
+import com.example.vbook.presentation.components.appbar.AppBarVM
+import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.example.vbook.toSliderFloat
 
 @Composable
 fun BookDetailedScreen(
     vm: BookDetailedVM,
-    navController: NavController
+    bookUrl: String,
 ) {
+    val appBarVM = LocalAppBarVM.current
+    LaunchedEffect(bookUrl) {
+        vm.init(bookUrl)
+    }
+    DisposableEffect(bookUrl){
+        appBarVM.apply {
+            setType(AppBarVM.Type.Default)
+        }
+        onDispose {}
+    }
     val bookState = vm.bookState.collectAsState()
     StateSection(state = bookState.value) { book ->
         val playbackInfo =
@@ -45,7 +58,7 @@ fun BookDetailedScreen(
         BookDetailedBody(
             book = book,
             downloadsStatusState = downloadsStatusState,
-            onDownload = vm::onDownload,
+            onDownloadClick = vm::onDownloadClick,
             trackIndex = playbackInfo.trackIndex,
             trackTime = playbackInfo.trackTime,
             hasNext = playbackInfo.hasNext,
@@ -59,16 +72,14 @@ fun BookDetailedScreen(
             onSeek = { player.seekTo(it) }
         )
     }
-
-
 }
 
 
 @Composable
 fun BookDetailedBody(
     book: Book,
-    downloadsStatusState: ResourceState<Map<String, ResourceState<Unit>>>,
-    onDownload: (String,Book) -> Unit = { _,_ -> },
+    downloadsStatusState: ResourceState<Map<String, DownloadingItem.Status>>,
+    onDownloadClick: (String, Book) -> Unit = { _, _ -> },
     trackIndex: Int,
     trackTime: Pair<Long, Long>,
     isPlaying: Boolean,
@@ -84,6 +95,13 @@ fun BookDetailedBody(
     var showDialog by remember {
         mutableStateOf(false)
     }
+    DownloadingDialog(
+        showDialog = showDialog,
+        onClose = { showDialog = false },
+        onDownloadClick = onDownloadClick,
+        book = book,
+        downloadsStatusState = downloadsStatusState
+    )
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -102,24 +120,27 @@ fun BookDetailedBody(
                 .fillMaxSize()
                 .weight(3f)
         )
-        Button(onClick = { showDialog = true }) {
-            DownloadingDialog(
-                showDialog = showDialog,
-                onClose = { showDialog = false },
-                onDownload = onDownload,
-                book = book,
-                downloadsStatusState = downloadsStatusState
-            )
-        }
 
         Text(
-            text = book.mp3List!![trackIndex].first +
-                    "(${trackIndex + 1} из ${book.mp3List!!.size})",
+            text = book.mediaItems!![trackIndex].first +
+                    "(${trackIndex + 1} из ${book.mediaItems!!.size})",
             modifier = Modifier.weight(1f)
         )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Download,
+                contentDescription = null,
+                Modifier.clickable {showDialog = true })
+        }
         PlayerController(
             modifier = Modifier
-                .weight(3f)
+                .weight(2f)
                 .padding(8.dp),
             trackTime.first, trackTime.second, isPlaying,
             hasNext, onPlay, onPause, onRewind,
@@ -214,8 +235,8 @@ fun PlayerController(
 @Composable
 fun DownloadingDialog(
     showDialog: Boolean,
-    downloadsStatusState: ResourceState<Map<String, ResourceState<Unit>>>,
-    onDownload: (String,Book) -> Unit,
+    downloadsStatusState: ResourceState<Map<String, DownloadingItem.Status>>,
+    onDownloadClick: (String, Book) -> Unit,
     book: Book,
     onClose: () -> Unit
 ) {
@@ -231,21 +252,86 @@ fun DownloadingDialog(
                     .padding(16.dp)
                     .fillMaxSize(),
                 shape = RoundedCornerShape(16.dp),
-                color = Color.LightGray
+                color = Color(0xDCFFFFFF)
             ) {
                 StateSection(state = downloadsStatusState) { downloadsStatus ->
                     LazyColumn(Modifier.fillMaxSize()) {
                         items(downloadsStatus.size) { index ->
-                            val status = downloadsStatus.getValue(book.mp3List!![index].second)
-                            Text(text = status.toString(), modifier = Modifier.clickable {
-                                onDownload(book.mp3List!![index].second,book)
-                            })
+                            DownloadingItem(
+                                book = book,
+                                index = index,
+                                downloadsStatus = downloadsStatus,
+                                onDownloadClick = onDownloadClick
+                            )
                         }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun DownloadingItem(
+    book: Book,
+    index: Int,
+    downloadsStatus: Map<String, DownloadingItem.Status>,
+    onDownloadClick: (String, Book) -> Unit,
+) {
+    val downloadingItemTitle = book.mediaItems!![index].first
+    val downloadingItemOnlineUri = book.mediaItems!![index].second
+    val status = downloadsStatus.getValue(downloadingItemOnlineUri)
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        border = BorderStroke(1.dp, color = Color.Black)
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = downloadingItemTitle, modifier = Modifier.weight(9f))
+            when (status) {
+                DownloadingItem.Status.EMPTY -> {
+                    Icon(
+                        imageVector = Icons.Default.DownloadForOffline,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable {
+                                onDownloadClick(book.mediaItems!![index].second, book)
+                            }
+                            .padding(4.dp)
+                    )
+                }
+                DownloadingItem.Status.DOWNLOADING -> {
+                    Icon(
+                        imageVector = Icons.Default.Downloading,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable {
+                                onDownloadClick(book.mediaItems!![index].second, book)
+                            }
+                            .padding(4.dp)
+                    )
+                }
+                DownloadingItem.Status.SUCCESS -> {
+                    Icon(
+                        imageVector = Icons.Default.DownloadDone,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable {
+                                onDownloadClick(book.mediaItems!![index].second, book)
+                            }
+                            .padding(4.dp)
+                    )
+                }
+            }
+
+        }
+    }
+
 
 }
 
