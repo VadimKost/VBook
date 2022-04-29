@@ -28,13 +28,13 @@ open class NewBooksVM @Inject constructor(
         loadMoreNewBooks()
     }
 
-    val _booksState = MutableStateFlow<ResourceState<List<Book>>>(ResourceState.Loading)
+    private val _booksState = MutableStateFlow<ResourceState<List<Book>>>(ResourceState.Loading)
     val booksState = _booksState.asStateFlow()
 
-    val _isRefreshing = MutableStateFlow(false)
+    private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    val _canBeRefreshed = MutableStateFlow(false)
+    private val _canBeRefreshed = MutableStateFlow(false)
     val canBeRefreshed = _canBeRefreshed.asStateFlow()
 
     var bookList = listOf<Book>()

@@ -8,9 +8,11 @@ interface BookRepository {
 
     suspend fun searchBooks(value:String,page: Int): ResourceState<List<Book>>
 
-    suspend fun getCurrentBook(): ResourceState<Book>
+    suspend fun getFavoriteBooks(): ResourceState<List<Book>>
 
-    suspend fun updateBook(book: Book):Boolean
+    suspend fun setIsBookFavorite(bookUrl: String,isFavorite:Boolean)
+
+    suspend fun saveBookTimeLine(book: Book)
 
     suspend fun getFilledBook(
         bookUrl: String,

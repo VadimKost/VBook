@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -20,7 +21,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
@@ -41,7 +41,7 @@ fun BookDetailedScreen(
     LaunchedEffect(bookUrl) {
         vm.init(bookUrl)
     }
-    DisposableEffect(bookUrl){
+    DisposableEffect(bookUrl) {
         appBarVM.apply {
             setType(AppBarVM.Type.Default)
         }
@@ -59,6 +59,8 @@ fun BookDetailedScreen(
             book = book,
             downloadsStatusState = downloadsStatusState,
             onDownloadClick = vm::onDownloadClick,
+            onAddToFavorites = { vm.setIsBookFavorite(true) },
+            onRemoveFromFavorites = {vm.setIsBookFavorite(false)},
             trackIndex = playbackInfo.trackIndex,
             trackTime = playbackInfo.trackTime,
             hasNext = playbackInfo.hasNext,
@@ -80,6 +82,8 @@ fun BookDetailedBody(
     book: Book,
     downloadsStatusState: ResourceState<Map<String, DownloadingItem.Status>>,
     onDownloadClick: (String, Book) -> Unit = { _, _ -> },
+    onAddToFavorites: () -> Unit,
+    onRemoveFromFavorites: () -> Unit,
     trackIndex: Int,
     trackTime: Pair<Long, Long>,
     isPlaying: Boolean,
@@ -133,14 +137,28 @@ fun BookDetailedBody(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
         ) {
+            if (book.isFavorite){
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    Modifier.clickable { onRemoveFromFavorites() }
+                )
+            }else{
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = null,
+                    Modifier.clickable { onAddToFavorites() }
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.Default.Download,
                 contentDescription = null,
-                Modifier.clickable {showDialog = true })
+                Modifier.clickable { showDialog = true })
         }
         PlayerController(
             modifier = Modifier
-                .weight(2f)
                 .padding(8.dp),
             trackTime.first, trackTime.second, isPlaying,
             hasNext, onPlay, onPause, onRewind,

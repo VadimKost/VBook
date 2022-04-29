@@ -22,72 +22,70 @@ import com.example.vbook.common.model.Book
 
 @Composable
 fun BookList(
-    booksState: ResourceState<List<Book>>,
+    books:List<Book>,
     onItemClick: (String) -> Unit = {},
     onAddMore: () -> Unit = {}
 ) {
-    StateSection(state = booksState) { books ->
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(books) { book ->
-                Card(
-                    border = BorderStroke(1.dp, Color.Gray),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(5.dp)
-                        .clickable(onClick = { onItemClick(book.bookURL) })
-                ) {
-                    Row {
-                        Image(
-                            painter = rememberImagePainter(
-                                data = book.coverURL,
-                                builder = {
-                                    crossfade(true)
-                                },
-                            ),
-                            contentScale = ContentScale.FillWidth,
-                            contentDescription = null,
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        items(books) { book ->
+            Card(
+                border = BorderStroke(1.dp, Color.Gray),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .padding(5.dp)
+                    .clickable(onClick = { onItemClick(book.bookURL) })
+            ) {
+                Row {
+                    Image(
+                        painter = rememberImagePainter(
+                            data = book.coverURL,
+                            builder = {
+                                crossfade(true)
+                            },
+                        ),
+                        contentScale = ContentScale.FillHeight,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .height(140.dp)
+                    )
+                    Column {
+                        Text(
+                            text = book.title,
                             modifier = Modifier
-                                .padding(5.dp)
-                                .size(140.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center
                         )
-                        Column {
+                        Row {
+                            Icon(imageVector = Icons.Filled.Person, contentDescription = null)
                             Text(
-                                text = book.title,
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Center
+                                text = book.author.first,
+                                style = MaterialTheme.typography.body2,
                             )
-                            Row {
-                                Icon(imageVector = Icons.Filled.Person, contentDescription = null)
-                                Text(
-                                    text = book.author.first,
-                                    style = MaterialTheme.typography.body2,
-                                )
-                            }
-                            Row {
-                                Icon(imageVector = Icons.Filled.Mic, contentDescription = null)
-                                Text(
-                                    text = book.reader.first,
-                                    style = MaterialTheme.typography.body2
-                                )
-                            }
+                        }
+                        Row {
+                            Icon(imageVector = Icons.Filled.Mic, contentDescription = null)
+                            Text(
+                                text = book.reader.first,
+                                style = MaterialTheme.typography.body2
+                            )
                         }
                     }
                 }
             }
+        }
 
-            item {
-                Button(
-                    onClick = onAddMore,
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(text = "MORE")
-                }
+        item {
+            Button(
+                onClick = onAddMore,
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = "MORE")
             }
         }
     }
