@@ -14,7 +14,7 @@ fun Book.mapToData() = BookEntity(
     cycle,
     cycleBookList,
     duration,
-    isCurrent,
+    isFavorite = isFavorite,
     stoppedTrackIndex,
     stoppedTrackTime
 )
@@ -32,7 +32,7 @@ fun BookEntity.mapToDomain() = Book(
     cycle,
     cycleBookList,
     duration,
-    isCurrent,
+    isFavorite = isFavorite,
     stoppedTrackIndex,
     stoppedTrackTime
 )

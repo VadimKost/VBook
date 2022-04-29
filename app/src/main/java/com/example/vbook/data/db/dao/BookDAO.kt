@@ -13,13 +13,20 @@ interface BookDAO{
     @Query("SELECT * FROM BookEntity")
     suspend fun getAllBooks(): List<BookEntity>
 
-    @Query("SELECT * FROM BookEntity WHERE isCurrent=1")
-    suspend fun getCurrentBook(): BookEntity?
-
     @Query("SELECT * FROM BookEntity WHERE bookURL=:bookUrl")
     suspend fun getBook(bookUrl:String): BookEntity?
 
-    @Update
-    suspend fun updateBook(book: BookEntity):Int
+    @Query("SELECT * FROM BookEntity WHERE isFavorite=1")
+    suspend fun getFavoriteBooks(): List<BookEntity>
+
+    @Query("UPDATE BookEntity SET isFavorite = :isFavorite WHERE bookURL=:bookUrl")
+    suspend fun setFavoriteBook(bookUrl: String,isFavorite:Boolean)
+
+    @Query(
+        "UPDATE BookEntity " +
+                "SET stoppedTrackTime = :stoppedTrackIndex,stoppedTrackTime = :stoppedTrackTime " +
+                "WHERE bookURL=:bookUrl")
+    suspend fun setBookTimeLine(bookUrl: String, stoppedTrackIndex:Int, stoppedTrackTime:Long)
+
 
 }

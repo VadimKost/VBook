@@ -20,7 +20,7 @@ data class BookEntity(
     @ColumnInfo(name = "cycle") val cycle:Pair<String,String>,
     @ColumnInfo(name = "cycleBookList") var cycleBookList: List<Pair<String,String>>?=null,
     @ColumnInfo(name = "duration") var duration: String?=null,
-    @ColumnInfo(name = "isCurrent") var isCurrent:Boolean,
+    @ColumnInfo(name = "isFavorite") var isFavorite:Boolean,
     @ColumnInfo(name = "stoppedTrackIndex")var stoppedTrackIndex:Int,
     @ColumnInfo(name = "stoppedTrackTime")var stoppedTrackTime:Long,
 

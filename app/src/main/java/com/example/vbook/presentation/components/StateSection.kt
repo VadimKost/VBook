@@ -2,6 +2,7 @@ package com.example.vbook.presentation.components
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
@@ -45,7 +46,9 @@ fun <T> StateSection(
 
         }
         is ResourceState.Empty -> {
-
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                Text(text = "Nothing to show")
+            }
         }
         is ResourceState.Success -> {
             content(state.data)

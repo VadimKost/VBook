@@ -1,6 +1,7 @@
 package com.example.vbook.presentation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -10,15 +11,19 @@ enum class VBookScreen(
 ) {
     NewBooks(
         icon = Icons.Filled.Search,
-        title = "New Books"
+        title = "New books"
     ),
     BookDetailed(
         icon = Icons.Filled.Search,
         title = ""
     ),
-    SearchedBook(
+    SearchedBooks(
     icon = Icons.Filled.Search,
     title = "Results"
+    ),
+    FavoriteBooks(
+        icon = Icons.Filled.Favorite,
+        title = "Favorite books"
     )
 }
 

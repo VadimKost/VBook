@@ -10,9 +10,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import com.example.vbook.presentation.ui.bookdetailed.BookDetailedScreen
 import com.example.vbook.presentation.ui.bookdetailed.BookDetailedVM
+import com.example.vbook.presentation.ui.favoritebooks.FavoriteBooksScreen
 import com.example.vbook.presentation.ui.newbooks.NewBooksScreen
 import com.example.vbook.presentation.ui.newbooks.NewBooksVM
-import com.example.vbook.presentation.ui.searchedbook.SearchedBookVM
 import com.example.vbook.presentation.ui.searchedbook.SearchedBooksScreen
 
 
@@ -43,14 +43,17 @@ fun VBookNavHost(
             BookDetailedScreen(vm, bookUrl!!)
         }
         composable(
-            VBookScreen.SearchedBook.name.addRouteArgs("query"),
+            VBookScreen.SearchedBooks.name.addRouteArgs("query"),
             arguments = listOf(navArgument("bookUrl"){
                 type = NavType.StringType
                 nullable = true
             })
         ){
             val query = it.arguments?.getString("query")
-            SearchedBooksScreen(query = query!!)
+            SearchedBooksScreen(vm = hiltViewModel(), query = query!!)
+        }
+        composable(VBookScreen.FavoriteBooks.name){
+            FavoriteBooksScreen(vm = hiltViewModel())
         }
     }
 }

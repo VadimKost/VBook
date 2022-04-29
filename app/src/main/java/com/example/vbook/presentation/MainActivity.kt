@@ -2,7 +2,6 @@ package com.example.vbook.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -49,7 +48,7 @@ fun VBookApp(){
             Scaffold(
                 scaffoldState = scaffoldState,
                 topBar = { VBookTopAppBar(scaffoldState) },
-                drawerContent = { Drawer() },
+                drawerContent = { Drawer(navController,scaffoldState) },
                 drawerBackgroundColor = MaterialTheme.colors.primaryVariant
             ) { innerPadding ->
                 VBookNavHost(

@@ -53,23 +53,24 @@ class BookRepositoryImpl @Inject constructor(
                     ResourceState.Success(book)
                 } else {
                     val bookDetailed = knigaVUheParser.getFilledBook(book)
-                    updateBook(book)
+                    saveBookTimeLine(book)
                     ResourceState.Success(bookDetailed)
                 }
             } else {
                 ResourceState.Empty
             }
         } catch (t: Throwable) {
+            Log.e("Book",t.stackTraceToString())
             return ResourceState.Error(t.toString() +" getFilledBook")
         }
 
     }
 
-    override suspend fun getCurrentBook(): ResourceState<Book> {
+    override suspend fun getFavoriteBooks(): ResourceState<List<Book>> {
         try {
-            val book = DB.bookDao().getCurrentBook()?.mapToDomain()
-            if (book != null) {
-                return ResourceState.Success(book)
+            val books = DB.bookDao().getFavoriteBooks().mapToDomain()
+            if (books.isNotEmpty()) {
+                return ResourceState.Success(books)
             } else {
                 return ResourceState.Empty
             }
@@ -78,10 +79,13 @@ class BookRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setIsBookFavorite(bookUrl: String, isFavorite: Boolean) {
+        DB.bookDao().setFavoriteBook(bookUrl, isFavorite)
+    }
 
-    override suspend fun updateBook(book: Book): Boolean {
-        val count = DB.bookDao().updateBook(book.mapToData())
-        return count >= 1
+
+    override suspend fun saveBookTimeLine(book: Book) {
+        DB.bookDao().setBookTimeLine(book.bookURL,book.stoppedTrackIndex,book.stoppedTrackTime)
     }
 
 

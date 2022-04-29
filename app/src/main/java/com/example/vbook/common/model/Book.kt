@@ -12,7 +12,7 @@ data class Book(
     var cycleBookList: List<Pair<String,String>>?=null,
     var duration: String?=null,
 
-    var isCurrent:Boolean=false,
+    var isFavorite:Boolean=false,
 
     var stoppedTrackIndex:Int=0,
     var stoppedTrackTime: Long=0,

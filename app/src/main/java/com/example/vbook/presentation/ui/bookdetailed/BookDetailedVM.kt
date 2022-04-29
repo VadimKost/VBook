@@ -163,6 +163,17 @@ class BookDetailedVM @Inject constructor(
     private suspend fun getInitialDownloadsStatus(book: Book): Map<String, DownloadingItem.Status> =
         downloadingItemRepository.getBookDownloadingItemsStatus(book)
 
+    fun setIsBookFavorite(isFavorite: Boolean) {
+        Log.e("Book","Book update to $isFavorite")
+        viewModelScope.launch(Dispatchers.IO) {
+            val bookState = _bookState.value
+            if (bookState is ResourceState.Success) {
+                bookRepository.setIsBookFavorite(bookState.data.bookURL,isFavorite)
+                _bookState.value = ResourceState.Success(bookState.data.copy(isFavorite = isFavorite))
+            }
+        }
+    }
+
 
     override fun onCleared() {
         super.onCleared()

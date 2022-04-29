@@ -16,8 +16,6 @@ import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import com.google.android.exoplayer2.upstream.HttpDataSource.HttpDataSourceException
-import com.google.android.exoplayer2.upstream.HttpDataSource.InvalidResponseCodeException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -134,7 +132,7 @@ class MediaService : Service() {
                     book.stoppedTrackTime = player.currentPosition
                 }
                 withContext(Dispatchers.IO) {
-                    bookRepository.updateBook(book)
+                    bookRepository.saveBookTimeLine(book)
                 }
             }
         }
