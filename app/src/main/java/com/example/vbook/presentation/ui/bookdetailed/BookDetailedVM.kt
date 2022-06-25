@@ -4,15 +4,6 @@ import android.app.DownloadManager
 import android.content.*
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.clickable
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DownloadDone
-import androidx.compose.material.icons.filled.DownloadForOffline
-import androidx.compose.material.icons.filled.Downloading
-import androidx.compose.runtime.Composer.Companion.Empty
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vbook.bindService
@@ -25,14 +16,11 @@ import com.example.vbook.common.ResourceState
 import com.example.vbook.common.model.Book
 import com.example.vbook.common.model.DownloadingItem
 import com.example.vbook.data.repository.mediaitem.DownloadingItemRepository
-import com.example.vbook.isSuccess
-import com.example.vbook.presentation.components.appbar.AppBarVM
 import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.google.android.exoplayer2.ExoPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -43,12 +31,28 @@ class BookDetailedVM @Inject constructor(
     val downloadingItemRepository: DownloadingItemRepository,
     @ApplicationContext val context: Context
 ) : ViewModel() {
-    private var _service: MediaService? = null
+    private val _serviceState: MutableStateFlow<ResourceState<MediaService>> =
+        MutableStateFlow(ResourceState.Loading)
+
     private var _serviceConnection: ServiceConnection? = null
 
     private val _bookState: MutableStateFlow<ResourceState<Book>> =
         MutableStateFlow(ResourceState.Loading)
     val bookState = _bookState.asStateFlow()
+
+    val isServiceBookSame = flow {
+        _serviceState.collect{
+            val serviceBookState = it.getOrNull()?.serviceBook
+            if (serviceBookState != null){
+                combine(serviceBookState,bookState){serviceBook,currentBook ->
+                    return@combine serviceBook == currentBook.getOrNull()
+                }.collect{
+                    emit(it)
+                }
+
+            }
+        }
+    }
 
     private val _downloadsState: MutableStateFlow<ResourceState<Map<String, DownloadingItem.Status>>> =
         MutableStateFlow(ResourceState.Loading)
@@ -87,7 +91,7 @@ class BookDetailedVM @Inject constructor(
                     val itemToReplace =
                         book.mediaItems!!.first { downloadingItem.data.mediaOnlineUri == it.second }
                     val indexToReplace = book.mediaItems!!.indexOf(itemToReplace)
-                    _service?.replaceMediaItem(
+                    _serviceState.value.getOrNull()?.replaceMediaItem(
                         itemToReplace.second,
                         itemToReplace.first,
                         book.author.first,
@@ -119,6 +123,7 @@ class BookDetailedVM @Inject constructor(
                 DownloadingItem.Status.SUCCESS -> {
                     Toast.makeText(context, "Fake Delete", Toast.LENGTH_SHORT).show()
                 }
+                else -> {}
             }
         }
 
@@ -135,6 +140,7 @@ class BookDetailedVM @Inject constructor(
                     }
                 }
                 is ResourceState.Error -> _bookState.value = ResourceState.Error(book.message)
+                else -> {}
             }
         }
     }
@@ -146,9 +152,8 @@ class BookDetailedVM @Inject constructor(
 
     private suspend fun bindBookToMediaService(book: Book) {
         val (service, connection) = bindService(context)
-        _service = service
+        _serviceState.value = ResourceState.Success(service)
         _serviceConnection = connection
-        _service?.setBook(book)
 
         playbackMetadata = service.playbackInfo
         player = service.player
@@ -164,21 +169,29 @@ class BookDetailedVM @Inject constructor(
         downloadingItemRepository.getBookDownloadingItemsStatus(book)
 
     fun setIsBookFavorite(isFavorite: Boolean) {
-        Log.e("Book","Book update to $isFavorite")
+        Log.e("Book", "Book update to $isFavorite")
         viewModelScope.launch(Dispatchers.IO) {
             val bookState = _bookState.value
             if (bookState is ResourceState.Success) {
-                bookRepository.setIsBookFavorite(bookState.data.bookURL,isFavorite)
-                _bookState.value = ResourceState.Success(bookState.data.copy(isFavorite = isFavorite))
+                bookRepository.setIsBookFavorite(bookState.data.bookURL, isFavorite)
+                _bookState.value =
+                    ResourceState.Success(bookState.data.copy(isFavorite = isFavorite))
             }
         }
     }
 
+    fun onPlay() {
+        bookState.value.onSuccess { bookState ->
+            viewModelScope.launch {
+                _serviceState.value.getOrNull()?.setBook(bookState)
+                player.play()
+            }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()
         _serviceConnection?.let { context.unbindService(it) }
-        _service = null
         _serviceConnection = null
         context.unregisterReceiver(broadcastReceiver)
     }

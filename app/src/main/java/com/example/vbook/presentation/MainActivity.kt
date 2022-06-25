@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.vbook.presentation.components.BottomBar
 import com.example.vbook.presentation.theme.VBookTheme
 import com.example.vbook.presentation.components.Drawer
 import com.example.vbook.presentation.components.appbar.AppBarVM
@@ -48,8 +49,7 @@ fun VBookApp(){
             Scaffold(
                 scaffoldState = scaffoldState,
                 topBar = { VBookTopAppBar(scaffoldState) },
-                drawerContent = { Drawer(navController,scaffoldState) },
-                drawerBackgroundColor = MaterialTheme.colors.primaryVariant
+                bottomBar = { BottomBar(navController = navController)}
             ) { innerPadding ->
                 VBookNavHost(
                     navController = navController,

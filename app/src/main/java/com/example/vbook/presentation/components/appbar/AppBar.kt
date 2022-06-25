@@ -8,12 +8,14 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.vbook.presentation.LocalAppBarVM
 import com.example.vbook.presentation.LocalNavController
@@ -34,7 +36,8 @@ fun VBookTopAppBar(scaffoldState: ScaffoldState) {
     AppropriateAppBar(
         scaffoldState,
         scope,
-        currentScreenTitle
+        currentScreenTitle,
+        navController
     )
 }
 
@@ -43,25 +46,26 @@ fun AppropriateAppBar(
     scaffoldState: ScaffoldState,
     scope: CoroutineScope,
     title: String,
+    navController: NavController
 ) {
     val localAppBarVm = LocalAppBarVM.current
     val appBarType = localAppBarVm.currentType.collectAsState()
     when (appBarType.value) {
         AppBarVM.Type.Default -> {
-            DefaultAppBar(scaffoldState, scope, title)
+            DefaultAppBar(scaffoldState, scope, title, navController)
         }
-        AppBarVM.Type.Search ->{
-            DefaultAppBar(scaffoldState,scope,title){
+        AppBarVM.Type.Search -> {
+            DefaultAppBar(scaffoldState, scope, title, navController) {
                 val isExpanded = localAppBarVm.isSearchBarOpened.collectAsState()
                 val text = localAppBarVm.searchTextState.collectAsState()
-                if (isExpanded.value){
+                if (isExpanded.value) {
                     SearchBar(
-                        text = text.value ,
-                        onTextChange = {localAppBarVm.updateSearchBarText(it)} ,
+                        text = text.value,
+                        onTextChange = { localAppBarVm.updateSearchBarText(it) },
                         onCloseClicked = localAppBarVm.onClose,
                         onSearchClicked = localAppBarVm.onSearch
                     )
-                }else{
+                } else {
                     IconButton(onClick = { localAppBarVm.isSearchBarOpened.value = true }) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -80,25 +84,32 @@ fun DefaultAppBar(
     scaffoldState: ScaffoldState,
     scope: CoroutineScope,
     title: String,
-    content: @Composable RowScope.()->Unit = {}
+    navController: NavController,
+    content: @Composable RowScope.() -> Unit = {}
 ) {
+    val screens = listOf(VBookScreen.NewBooks, VBookScreen.FavoriteBooks)
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
     TopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
-            IconButton(
-                onClick = {
-                    scope.launch {
-                        scaffoldState.drawerState.open()
-                    }
-                },
-            ) {
-                Icon(
-                    Icons.Rounded.Menu,
-                    contentDescription = ""
-                )
+            if (currentDestination?.route !in screens.map { it.name }) {
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
+                    },
+                ) {
+                    Icon(
+                        Icons.Rounded.ArrowBack,
+                        contentDescription = ""
+                    )
+                }
             }
+
         },
-        actions =  content
+        actions = content
     )
 }
 

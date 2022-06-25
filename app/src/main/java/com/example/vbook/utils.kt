@@ -22,18 +22,6 @@ fun BookEntity.isDetailed(): Boolean {
     return mediaItems != null
 }
 
-@Composable
-fun <T> ResourceState<T>.IsSuccess(action: @Composable (ResourceState.Success<T>) -> Unit) {
-    if (this is ResourceState.Success<T>) {
-        action(this)
-    }
-}
-
-fun <T> ResourceState<T>.isSuccess(action: (ResourceState.Success<T>) -> Unit) {
-    if (this is ResourceState.Success<T>) {
-        action(this)
-    }
-}
 
 fun Long.toTime(): String {
     val minutes = this / 1000 / 60

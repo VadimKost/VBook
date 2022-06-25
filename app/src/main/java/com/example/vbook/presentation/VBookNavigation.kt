@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
+import androidx.navigation.navArgument
 import com.example.vbook.presentation.ui.bookdetailed.BookDetailedScreen
 import com.example.vbook.presentation.ui.bookdetailed.BookDetailedVM
 import com.example.vbook.presentation.ui.favoritebooks.FavoriteBooksScreen

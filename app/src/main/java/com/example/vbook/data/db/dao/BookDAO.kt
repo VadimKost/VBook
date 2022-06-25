@@ -24,9 +24,9 @@ interface BookDAO{
 
     @Query(
         "UPDATE BookEntity " +
-                "SET stoppedTrackTime = :stoppedTrackIndex,stoppedTrackTime = :stoppedTrackTime " +
+                "SET stoppedTrackIndex = :stoppedTrackIndex,stoppedTrackTime = :stoppedTrackTime " +
                 "WHERE bookURL=:bookUrl")
-    suspend fun setBookTimeLine(bookUrl: String, stoppedTrackIndex:Int, stoppedTrackTime:Long)
+    suspend fun savePlaybackPosition(bookUrl: String, stoppedTrackIndex:Int, stoppedTrackTime:Long)
 
 
 }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -48,6 +47,8 @@ fun BookDetailedScreen(
         onDispose {}
     }
     val bookState = vm.bookState.collectAsState()
+    val isServiceBookSame = vm.isServiceBookSame.collectAsState(initial = false)
+
     StateSection(state = bookState.value) { book ->
         val playbackInfo =
             vm.playbackMetadata.collectAsState(initial = MediaPlayerManager.PlaybackInfo()).value
@@ -55,25 +56,39 @@ fun BookDetailedScreen(
 
         val downloadsStatusState = vm.downloadsState.collectAsState().value
 
-        BookDetailedBody(
-            book = book,
-            downloadsStatusState = downloadsStatusState,
-            onDownloadClick = vm::onDownloadClick,
-            onAddToFavorites = { vm.setIsBookFavorite(true) },
-            onRemoveFromFavorites = {vm.setIsBookFavorite(false)},
-            trackIndex = playbackInfo.trackIndex,
-            trackTime = playbackInfo.trackTime,
-            hasNext = playbackInfo.hasNext,
-            isPlaying = playbackInfo.isPlaying,
-            onPlay = player::play,
-            onPause = player::pause,
-            onRewind = player::seekBack,
-            onForward = player::seekForward,
-            onNext = player::seekToNextWindow,
-            onPrevious = player::seekToPreviousWindow,
-            onSeek = { player.seekTo(it) }
-        )
+        if (isServiceBookSame.value) {
+            BookDetailedBody(
+                book = book,
+                downloadsStatusState = downloadsStatusState,
+                onDownloadClick = vm::onDownloadClick,
+                onFavoriteClick = vm::setIsBookFavorite,
+                trackIndex = playbackInfo.trackIndex,
+                trackTime = playbackInfo.trackTime,
+                hasNext = playbackInfo.hasNext,
+                isPlaying = playbackInfo.isPlaying,
+                onPlay = vm::onPlay,
+                onPause = player::pause,
+                onRewind = player::seekBack,
+                onForward = player::seekForward,
+                onNext = player::seekToNextWindow,
+                onPrevious = player::seekToPreviousWindow,
+                onSeek = { player.seekTo(it) }
+            )
+        }else{
+            BookDetailedBody(
+                book = book,
+                downloadsStatusState = downloadsStatusState,
+                onDownloadClick = vm::onDownloadClick,
+                onFavoriteClick = vm::setIsBookFavorite,
+                trackIndex = 0,
+                trackTime = 0L to 0L,
+                hasNext = false,
+                isPlaying = false,
+                onPlay = vm::onPlay,
+            )
+        }
     }
+
 }
 
 
@@ -82,8 +97,7 @@ fun BookDetailedBody(
     book: Book,
     downloadsStatusState: ResourceState<Map<String, DownloadingItem.Status>>,
     onDownloadClick: (String, Book) -> Unit = { _, _ -> },
-    onAddToFavorites: () -> Unit,
-    onRemoveFromFavorites: () -> Unit,
+    onFavoriteClick: (Boolean) -> Unit,
     trackIndex: Int,
     trackTime: Pair<Long, Long>,
     isPlaying: Boolean,
@@ -94,7 +108,7 @@ fun BookDetailedBody(
     onForward: () -> Unit = {},
     onNext: () -> Unit = {},
     onPrevious: () -> Unit = {},
-    onSeek: (Long) -> Unit
+    onSeek: (Long) -> Unit = {}
 ) {
     var showDialog by remember {
         mutableStateOf(false)
@@ -137,17 +151,17 @@ fun BookDetailedBody(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
         ) {
-            if (book.isFavorite){
+            if (book.isFavorite) {
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = null,
-                    Modifier.clickable { onRemoveFromFavorites() }
+                    Modifier.clickable { onFavoriteClick(!book.isFavorite) }
                 )
-            }else{
+            } else {
                 Icon(
                     imageVector = Icons.Default.FavoriteBorder,
                     contentDescription = null,
-                    Modifier.clickable { onAddToFavorites() }
+                    Modifier.clickable { onFavoriteClick(!book.isFavorite) }
                 )
             }
 
@@ -345,6 +359,7 @@ fun DownloadingItem(
                             .padding(4.dp)
                     )
                 }
+                else -> {}
             }
 
         }

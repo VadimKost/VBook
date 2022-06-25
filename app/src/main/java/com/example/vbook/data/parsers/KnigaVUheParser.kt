@@ -21,7 +21,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         val url=base_url+book.bookURL
         var jsonMp3=""
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
-            .referrer("http://www.google.com").timeout(5000).get()
+            .referrer("http://www.google.com").get()
         val scripts =doc.getElementsByTag("script")
         //Todo Make more Universal
         for(i in scripts){
@@ -54,7 +54,7 @@ class KnigaVUheParser @Inject constructor() : BooksParser() {
         val list:MutableList<Book> = mutableListOf()
 
         val doc = Jsoup.connect(url).userAgent("Chrome/4.0.249.0 Safari/532.5")
-            .referrer("http://www.google.com").timeout(2000).get()
+            .referrer("http://www.google.com").get()
         val books = doc.select(".bookkitem")
 
         for(element in books){

@@ -54,6 +54,7 @@ open class NewBooksVM @Inject constructor(
                     _canBeRefreshed.value = true
                     _booksState.value = ResourceState.Error(books.message)
                 }
+                else -> {}
             }
         }
     }

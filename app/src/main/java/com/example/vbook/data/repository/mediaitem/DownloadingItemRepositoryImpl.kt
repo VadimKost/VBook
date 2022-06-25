@@ -55,6 +55,7 @@ class DownloadingItemRepositoryImpl @Inject constructor(
                 }
                 return status
             }
+            else -> {}
         }
         return status
     }

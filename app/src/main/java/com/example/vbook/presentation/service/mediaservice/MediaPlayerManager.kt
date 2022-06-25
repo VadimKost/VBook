@@ -11,12 +11,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
+import java.util.EventListener
 
 class MediaPlayerManager(
     private val player: ExoPlayer,
-    playerListener: Player.Listener,
+    playerListener:  Player.Listener,
     val downloadingItemRepository: DownloadingItemRepository
 ) {
 
@@ -44,9 +43,9 @@ class MediaPlayerManager(
         PlaybackInfo(isPlaying, hasNext, trackIndex, trackTime)
     }
 
-    fun updatePlayListStateInfo() {
-        _trackIndex.value = player.currentWindowIndex
-        _isPlaying.value = player.isPlaying
+    fun updatePlaybackState() {
+        _trackIndex.value = player.currentMediaItemIndex
+        _isPlaying.value = player.playWhenReady
         _hasNext.value = player.hasNextMediaItem()
     }
 
@@ -57,7 +56,7 @@ class MediaPlayerManager(
 
         player.addMediaItems(getMediaItemList(book))
         player.seekTo(initialWindowIndex, playbackStartPositionMs)
-        updatePlayListStateInfo()
+        updatePlaybackState()
     }
 
     suspend fun replaceMediaItem(

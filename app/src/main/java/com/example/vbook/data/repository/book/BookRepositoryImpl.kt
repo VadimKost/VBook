@@ -53,7 +53,7 @@ class BookRepositoryImpl @Inject constructor(
                     ResourceState.Success(book)
                 } else {
                     val bookDetailed = knigaVUheParser.getFilledBook(book)
-                    saveBookTimeLine(book)
+                    savePlaybackPosition(book)
                     ResourceState.Success(bookDetailed)
                 }
             } else {
@@ -84,8 +84,8 @@ class BookRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun saveBookTimeLine(book: Book) {
-        DB.bookDao().setBookTimeLine(book.bookURL,book.stoppedTrackIndex,book.stoppedTrackTime)
+    override suspend fun savePlaybackPosition(book: Book) {
+        DB.bookDao().savePlaybackPosition(book.bookURL,book.stoppedTrackIndex,book.stoppedTrackTime)
     }
 
 

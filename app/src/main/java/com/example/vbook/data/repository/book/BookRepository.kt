@@ -12,7 +12,7 @@ interface BookRepository {
 
     suspend fun setIsBookFavorite(bookUrl: String,isFavorite:Boolean)
 
-    suspend fun saveBookTimeLine(book: Book)
+    suspend fun savePlaybackPosition(book: Book)
 
     suspend fun getFilledBook(
         bookUrl: String,

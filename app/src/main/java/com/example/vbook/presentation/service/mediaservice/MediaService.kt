@@ -30,8 +30,9 @@ class MediaService : Service() {
     @Inject
     lateinit var player: ExoPlayer
 
-    private lateinit var mediaNotificationManager: MediaNotificationManager
-    private lateinit var mediaPlayerManager: MediaPlayerManager
+    lateinit var mediaNotificationManager: MediaNotificationManager
+    lateinit var mediaPlayerManager: MediaPlayerManager
+
     private var isForegroundService = false
 
     @Inject
@@ -84,7 +85,11 @@ class MediaService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.e("VVV", "onDestroy")
-        saveBookStoppedIndexAndTime(_serviceBook.value)
+        savePlaybackPosition(
+            serviceBook.value,
+            player.currentMediaItemIndex,
+            player.currentPosition
+        )
         mediaSession.release()
         player.release()
         serviceCoroutineScope.cancel()
@@ -99,9 +104,9 @@ class MediaService : Service() {
     }
 
     suspend fun setBook(book: Book) {
-        val oldBook = _serviceBook.value
+        val oldBook = serviceBook.value
         if (oldBook != book) {
-            saveBookStoppedIndexAndTime(oldBook)
+            savePlaybackPosition(oldBook, player.currentMediaItemIndex, player.currentPosition)
             mediaPlayerManager.preparePlayListForPlayer(book)
             _serviceBook.value = book
             mediaNotificationManager.showNotificationForPlayer(player)
@@ -120,19 +125,19 @@ class MediaService : Service() {
         mediaPlayerManager.replaceMediaItem(mediaUri, title, author, artworkUri, index)
     }
 
-    private fun saveBookStoppedIndexAndTime(book: Book?) {
+    private fun savePlaybackPosition(book: Book?, trackIndex: Int, position: Long) {
         serviceCoroutineScope.launch {
             if (book != null) {
                 withContext(Dispatchers.Main) {
                     Log.d(
                         "BookSet",
-                        "${book.title} i= ${player.currentMediaItemIndex} t = ${player.contentPosition}"
+                        "${book.title} i= $trackIndex t = $position"
                     )
-                    book.stoppedTrackIndex = player.currentMediaItemIndex
-                    book.stoppedTrackTime = player.currentPosition
+                    book.stoppedTrackIndex = trackIndex
+                    book.stoppedTrackTime = position
                 }
                 withContext(Dispatchers.IO) {
-                    bookRepository.saveBookTimeLine(book)
+                    bookRepository.savePlaybackPosition(book)
                 }
             }
         }
@@ -142,18 +147,17 @@ class MediaService : Service() {
     private inner class PlayerEventListener : Player.Listener {
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            mediaPlayerManager.updatePlayListStateInfo()
+            mediaPlayerManager.updatePlaybackState()
         }
 
         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
             if (!playWhenReady) {
                 stopForeground(false)
                 isForegroundService = false
-                mediaPlayerManager.updatePlayListStateInfo()
-                Log.d("Book", "stop")
-                saveBookStoppedIndexAndTime(_serviceBook.value)
+                mediaPlayerManager.updatePlaybackState()
+                savePlaybackPosition(_serviceBook.value,player.currentMediaItemIndex,player.currentPosition)
             } else {
-                mediaPlayerManager.updatePlayListStateInfo()
+                mediaPlayerManager.updatePlaybackState()
             }
         }
 
