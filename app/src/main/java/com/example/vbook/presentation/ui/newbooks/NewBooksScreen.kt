@@ -3,10 +3,10 @@ package com.example.vbook.presentation.ui.newbooks
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.vbook.common.model.Book
+import com.example.vbook.domain.model.Book
 import com.example.vbook.presentation.VBookScreen
 import com.example.vbook.presentation.addArgs
-import com.example.vbook.common.ResourceState
+import com.example.vbook.domain.ResourceState
 import com.example.vbook.presentation.LocalAppBarVM
 import com.example.vbook.presentation.LocalNavController
 import com.example.vbook.presentation.components.BookList
@@ -27,7 +27,7 @@ fun NewBooksScreen(
 
     LaunchedEffect(vm) {
         Log.e("Book", "Launch-NB")
-        appBarVM.clearSearchBarCallBacks()
+        appBarVM.clearCallBacks()
         appBarVM.apply {
             setType(AppBarVM.Type.Search)
             setSearchBarCallBacks(

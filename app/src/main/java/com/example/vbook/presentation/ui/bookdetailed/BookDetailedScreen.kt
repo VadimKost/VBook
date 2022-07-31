@@ -1,5 +1,6 @@
 package com.example.vbook.presentation.ui.bookdetailed
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -21,15 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.rememberImagePainter
-import com.example.vbook.common.ResourceState
-import com.example.vbook.common.model.Book
-import com.example.vbook.common.model.DownloadingItem
+import com.example.vbook.domain.ResourceState
+import com.example.vbook.domain.model.Book
+import com.example.vbook.domain.model.DownloadingItem
 import com.example.vbook.presentation.LocalAppBarVM
 import com.example.vbook.toTime
 import com.example.vbook.presentation.components.StateSection
 import com.example.vbook.presentation.components.appbar.AppBarVM
-import com.example.vbook.presentation.service.mediaservice.MediaPlayerManager
 import com.example.vbook.toSliderFloat
+import kotlinx.coroutines.launch
 
 @Composable
 fun BookDetailedScreen(
@@ -38,43 +39,40 @@ fun BookDetailedScreen(
 ) {
     val appBarVM = LocalAppBarVM.current
     LaunchedEffect(bookUrl) {
-        vm.init(bookUrl)
-    }
-    DisposableEffect(bookUrl) {
+        appBarVM.clearCallBacks()
         appBarVM.apply {
             setType(AppBarVM.Type.Default)
         }
-        onDispose {}
+        vm.init(bookUrl)
     }
-    val bookState = vm.bookState.collectAsState()
-    val isServiceBookSame = vm.isServiceBookSame.collectAsState(initial = false)
 
-    StateSection(state = bookState.value) { book ->
-        val playbackInfo =
-            vm.playbackMetadata.collectAsState(initial = MediaPlayerManager.PlaybackInfo()).value
-        val player = vm.player
+    val localBook = vm.localBook.collectAsState()
+    val playbackInfo = vm.playbackInfo.collectAsState()
+    val isServiceBookSame = vm.isPlayerBookIsSame.collectAsState()
 
-        val downloadsStatusState = vm.downloadsState.collectAsState().value
-
+    val downloadsStatusState = vm.downloadsState.collectAsState().value
+    StateSection(state = localBook.value) { book ->
         if (isServiceBookSame.value) {
-            BookDetailedBody(
-                book = book,
-                downloadsStatusState = downloadsStatusState,
-                onDownloadClick = vm::onDownloadClick,
-                onFavoriteClick = vm::setIsBookFavorite,
-                trackIndex = playbackInfo.trackIndex,
-                trackTime = playbackInfo.trackTime,
-                hasNext = playbackInfo.hasNext,
-                isPlaying = playbackInfo.isPlaying,
-                onPlay = vm::onPlay,
-                onPause = player::pause,
-                onRewind = player::seekBack,
-                onForward = player::seekForward,
-                onNext = player::seekToNextWindow,
-                onPrevious = player::seekToPreviousWindow,
-                onSeek = { player.seekTo(it) }
-            )
-        }else{
+            StateSection(state = playbackInfo.value) { playbackInfo ->
+                BookDetailedBody(
+                    book = book,
+                    downloadsStatusState = downloadsStatusState,
+                    onDownloadClick = vm::onDownloadClick,
+                    onFavoriteClick = vm::setIsBookFavorite,
+                    trackIndex = playbackInfo.trackIndex,
+                    trackTime = playbackInfo.trackTime,
+                    hasNext = playbackInfo.hasNext,
+                    isPlaying = playbackInfo.isPlaying,
+                    onPlay = vm::play,
+                    onPause = vm::pause,
+                    onRewind = vm::seekBack,
+                    onForward = vm::seekForward,
+                    onNext = vm::seekToNextWindow,
+                    onPrevious = vm::seekToPreviousWindow,
+                    onSeek = { vm.seekTo(it) }
+                )
+            }
+        } else {
             BookDetailedBody(
                 book = book,
                 downloadsStatusState = downloadsStatusState,
@@ -84,11 +82,10 @@ fun BookDetailedScreen(
                 trackTime = 0L to 0L,
                 hasNext = false,
                 isPlaying = false,
-                onPlay = vm::onPlay,
+                onPlay = vm::play,
             )
         }
     }
-
 }
 
 
@@ -196,6 +193,10 @@ fun PlayerController(
     onPrevious: () -> Unit = {},
     onSeek: (Long) -> Unit = {},
 ) {
+    //TODO do better
+    var isChangingByUser by remember { mutableStateOf(false) }
+    var userTime by remember { mutableStateOf(0L) }
+    val currentTime = if (isChangingByUser) userTime else trackTime
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Bottom,
@@ -206,18 +207,22 @@ fun PlayerController(
         ) {
             Text(
                 modifier = Modifier.weight(1.5f),
-                text = trackTime.toTime(),
+                text = currentTime.toTime(),
                 style = MaterialTheme.typography.caption,
                 maxLines = 1
             )
             Slider(
                 modifier = Modifier.weight(8f),
                 valueRange = 0f..100f,
-                value = trackTime.toSliderFloat(duration),
+                value = currentTime.toSliderFloat(duration),
                 onValueChange = {
-                    val time = ((duration.toFloat() * it) / 100).toLong()
-                    onSeek(time)
+                    isChangingByUser = true
+                    userTime = ((duration.toFloat() * it) / 100).toLong()
                 },
+                onValueChangeFinished = {
+                    onSeek(userTime)
+                    isChangingByUser = false
+                }
             )
             Text(
                 modifier = Modifier

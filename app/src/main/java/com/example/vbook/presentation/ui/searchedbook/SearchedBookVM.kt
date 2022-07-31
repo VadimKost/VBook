@@ -1,13 +1,11 @@
 package com.example.vbook.presentation.ui.searchedbook
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import com.example.vbook.common.ResourceState
-import com.example.vbook.common.model.Book
-import com.example.vbook.data.repository.book.BookRepository
-import com.example.vbook.presentation.ui.newbooks.NewBooksVM
+import com.example.vbook.domain.repository.BookRepository
+import com.example.vbook.domain.ResourceState
+import com.example.vbook.domain.model.Book
+import com.example.vbook.domain.usecase.book.SearchBookUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,13 +16,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchedBookVM @Inject constructor(
-    val bookRepository: BookRepository
+    val searchBookUseCase: SearchBookUseCase
 ) : ViewModel() {
     fun init(query:String) {
         loadMoreNewBooks(query)
     }
 
-    private val _booksState = MutableStateFlow<ResourceState<List<Book>>>(ResourceState.Loading)
+    private val _booksState = MutableStateFlow<ResourceState<List<Book>>>(
+        ResourceState.Loading)
     val booksState = _booksState.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -38,7 +37,7 @@ class SearchedBookVM @Inject constructor(
 
     fun loadMoreNewBooks(value: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val books = bookRepository.searchBooks(value,page)
+            val books = searchBookUseCase(value,page)
             when (books) {
                 is ResourceState.Success -> {
                     page += 1

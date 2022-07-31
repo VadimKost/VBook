@@ -12,7 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.vbook.common.ResourceState
+import com.example.vbook.domain.ResourceState
 
 @Composable
 fun <T> StateSection(

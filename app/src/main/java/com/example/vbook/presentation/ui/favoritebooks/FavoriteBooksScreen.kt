@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,8 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
-import com.example.vbook.common.ResourceState
-import com.example.vbook.common.model.Book
+import com.example.vbook.domain.ResourceState
+import com.example.vbook.domain.model.Book
 import com.example.vbook.presentation.LocalAppBarVM
 import com.example.vbook.presentation.LocalNavController
 import com.example.vbook.presentation.VBookScreen
@@ -47,7 +46,7 @@ fun FavoriteBooksScreen(
     val booksState = vm.booksState.collectAsState()
 
     LaunchedEffect(vm) {
-        appBarVM.clearSearchBarCallBacks()
+        appBarVM.clearCallBacks()
         appBarVM.apply {
             setType(AppBarVM.Type.Search)
             setSearchBarCallBacks(
@@ -65,8 +64,9 @@ fun FavoriteBooksScreen(
                 }
             )
         }
+        vm.getFavoriteBooks()
     }
-    vm.getFavoriteBooks()
+
 
     FavoriteBooksBody(
         booksState = booksState.value,
@@ -92,7 +92,7 @@ fun FavoriteBooksBody(
                         .padding(4.dp)
                         .fillMaxWidth()
                         .height((256+64).dp)
-                        .clickable { onItemClick(book.bookURL) }, book = book
+                        .clickable { onItemClick(book.bookUrl) }, book = book
                 )
             }
         }

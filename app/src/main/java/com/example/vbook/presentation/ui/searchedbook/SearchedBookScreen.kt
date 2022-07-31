@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.vbook.common.ResourceState
-import com.example.vbook.common.model.Book
+import com.example.vbook.domain.ResourceState
+import com.example.vbook.domain.model.Book
 import com.example.vbook.presentation.LocalAppBarVM
 import com.example.vbook.presentation.LocalNavController
 import com.example.vbook.presentation.VBookScreen
@@ -32,7 +32,7 @@ fun SearchedBooksScreen(
     LaunchedEffect(vm) {
         Log.e("Book","Launch-NB")
         vm.init(query)
-        appBarVM.clearSearchBarCallBacks()
+        appBarVM.clearCallBacks()
         appBarVM.apply {
             setType(AppBarVM.Type.Search)
             setSearchBarCallBacks(

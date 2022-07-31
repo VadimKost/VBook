@@ -1,27 +1,10 @@
 package com.example.vbook
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
-import android.util.Log
-import androidx.compose.runtime.Composable
-import com.example.vbook.data.db.model.BookEntity
-import com.example.vbook.common.model.Book
-import com.example.vbook.common.ResourceState
-import com.example.vbook.presentation.service.mediaservice.MediaService
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import com.example.vbook.domain.model.Book
 
 fun Book.isDetailed(): Boolean {
     return mediaItems != null
 }
-
-fun BookEntity.isDetailed(): Boolean {
-    return mediaItems != null
-}
-
 
 fun Long.toTime(): String {
     val minutes = this / 1000 / 60
@@ -40,20 +23,7 @@ fun Long.toSliderFloat(duration: Long): Float {
 }
 
 
-suspend fun bindService(context: Context): Pair<MediaService, ServiceConnection> {
-    return suspendCoroutine { continuation ->
-        context.bindService(Intent(context, MediaService::class.java), object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val playerServiceBinder = service as MediaService.PlayerServiceBinder
-                val service = playerServiceBinder.service
-                continuation.resume(Pair(service, this))
-            }
 
-            override fun onServiceDisconnected(name: ComponentName?) {
-            }
-        }, Context.BIND_AUTO_CREATE)
-    }
-}
 
 
 

@@ -1,6 +1,5 @@
 package com.example.vbook.presentation.components.appbar
 
-import android.support.v4.media.MediaBrowserCompat
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,18 +36,15 @@ class AppBarVM @Inject constructor() : ViewModel() {
         onClose = onCloseCallback
     }
 
-    fun clearSearchBarCallBacks() {
-        isSearchBarOpened.value = false
-        onSearch = {}
-        onClose = {}
-
-    }
-
     //Search block end
     fun setType(type: Type) {
         _currentType.value = type
     }
-
+    fun clearCallBacks() {
+        isSearchBarOpened.value = false
+        onSearch = {}
+        onClose = {}
+    }
 
     enum class Type() {
         Default, Search

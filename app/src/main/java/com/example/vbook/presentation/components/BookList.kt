@@ -17,8 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
-import com.example.vbook.common.ResourceState
-import com.example.vbook.common.model.Book
+import com.example.vbook.domain.model.Book
 
 @Composable
 fun BookList(
@@ -36,7 +35,7 @@ fun BookList(
                     .fillMaxWidth()
                     .height(150.dp)
                     .padding(5.dp)
-                    .clickable(onClick = { onItemClick(book.bookURL) })
+                    .clickable(onClick = { onItemClick(book.bookUrl) })
             ) {
                 Row {
                     Image(

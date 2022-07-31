@@ -1,17 +1,11 @@
 package com.example.vbook.presentation.ui.newbooks
 
-import android.app.DownloadManager
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import com.example.vbook.data.repository.book.BookRepository
-import com.example.vbook.common.model.Book
-import com.example.vbook.common.ResourceState
-import com.example.vbook.presentation.VBookScreen
-import com.example.vbook.presentation.addArgs
-import com.example.vbook.presentation.addRouteArgs
-import com.example.vbook.presentation.components.appbar.AppBarVM
+import com.example.vbook.domain.repository.BookRepository
+import com.example.vbook.domain.ResourceState
+import com.example.vbook.domain.model.Book
+import com.example.vbook.domain.usecase.book.GetNewBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,13 +16,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 open class NewBooksVM @Inject constructor(
-    val bookRepository: BookRepository
+    val getNewBooksUseCase: GetNewBooksUseCase
 ) : ViewModel() {
     init {
         loadMoreNewBooks()
     }
 
-    private val _booksState = MutableStateFlow<ResourceState<List<Book>>>(ResourceState.Loading)
+    private val _booksState = MutableStateFlow<ResourceState<List<Book>>>(
+        ResourceState.Loading)
     val booksState = _booksState.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -42,7 +37,7 @@ open class NewBooksVM @Inject constructor(
 
     fun loadMoreNewBooks() {
         viewModelScope.launch(Dispatchers.IO) {
-            val books = bookRepository.fetchNewBooks(page)
+            val books = getNewBooksUseCase(page)
             when (books) {
                 is ResourceState.Success -> {
                     page += 1
