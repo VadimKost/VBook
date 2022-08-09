@@ -10,10 +10,14 @@ Existing features:
 
 Screenshots:
 ---------
-- <img src="Screenshots/New.jpg" width="250">
-- <img src="Screenshots/Search.jpg" width="250">
-- <img src="Screenshots/Audio.jpg" width="250">
-- <img src="Screenshots/Download.jpg" width="250">
+<details>
+ <summary> Details </summary>
+ <img src="Screenshots/New.jpg" width="250">
+ <img src="Screenshots/Search.jpg" width="250">
+ <img src="Screenshots/Audio.jpg" width="250">
+ <img src="Screenshots/Download.jpg" width="250">
+</details>
+
 
 
 
