@@ -12,7 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
-import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
 import coil.request.ImageRequest
@@ -117,7 +117,7 @@ class MediaNotificationManager(
             player: Player,
             callback: PlayerNotificationManager.BitmapCallback
         ): Bitmap {
-            return icon ?: AppCompatResources.getDrawable(context,R.drawable.ic_launcher_background)!!
+            return icon ?: ContextCompat.getDrawable(context,R.drawable.ic_launcher_background)!!
                 .toBitmap(100, 100)
         }
     }

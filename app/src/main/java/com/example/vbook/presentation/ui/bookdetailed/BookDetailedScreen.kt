@@ -1,6 +1,5 @@
 package com.example.vbook.presentation.ui.bookdetailed
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -11,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -26,11 +26,10 @@ import com.example.vbook.domain.ResourceState
 import com.example.vbook.domain.model.Book
 import com.example.vbook.domain.model.DownloadingItem
 import com.example.vbook.presentation.LocalAppBarVM
-import com.example.vbook.toTime
 import com.example.vbook.presentation.components.StateSection
 import com.example.vbook.presentation.components.appbar.AppBarVM
 import com.example.vbook.toSliderFloat
-import kotlinx.coroutines.launch
+import com.example.vbook.toTime
 
 @Composable
 fun BookDetailedScreen(
@@ -208,7 +207,7 @@ fun PlayerController(
             Text(
                 modifier = Modifier.weight(1.5f),
                 text = currentTime.toTime(),
-                style = MaterialTheme.typography.caption,
+                style = MaterialTheme.typography.bodySmall,
                 maxLines = 1
             )
             Slider(
@@ -229,7 +228,7 @@ fun PlayerController(
                     .weight(1.5f)
                     .padding(start = 5.dp),
                 text = duration.toTime(),
-                style = MaterialTheme.typography.caption,
+                style = MaterialTheme.typography.bodySmall,
                 maxLines = 1
             )
         }

@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,9 +17,9 @@ import com.example.vbook.domain.ResourceState
 @Composable
 fun <T> StateSection(
     state: ResourceState<T>,
-    modifier:Modifier=Modifier,
-    content: @Composable (T) -> Unit)
-{
+    modifier: Modifier = Modifier,
+    content: @Composable (T) -> Unit
+) {
     when (state) {
         is ResourceState.Loading -> {
             Column(
@@ -40,13 +40,12 @@ fun <T> StateSection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Log.e("VBook",state.message)
-                Text( text = state.message)
+                Text(text = state.message)
             }
 
         }
         is ResourceState.Empty -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = "Nothing to show")
             }
         }

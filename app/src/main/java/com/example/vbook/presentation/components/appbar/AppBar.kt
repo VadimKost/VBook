@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun VBookTopAppBar(scaffoldState: ScaffoldState) {
+fun VBookTopAppBar() {
     val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
     val screens = VBookScreen.values()
@@ -34,8 +35,6 @@ fun VBookTopAppBar(scaffoldState: ScaffoldState) {
     val currentScreenTitle =
         screens.asSequence().firstOrNull { route.startsWith(it.name) }?.title ?: ""
     AppropriateAppBar(
-        scaffoldState,
-        scope,
         currentScreenTitle,
         navController
     )
@@ -43,8 +42,6 @@ fun VBookTopAppBar(scaffoldState: ScaffoldState) {
 
 @Composable
 fun AppropriateAppBar(
-    scaffoldState: ScaffoldState,
-    scope: CoroutineScope,
     title: String,
     navController: NavController
 ) {
@@ -52,10 +49,10 @@ fun AppropriateAppBar(
     val appBarType = localAppBarVm.currentType.collectAsState()
     when (appBarType.value) {
         AppBarVM.Type.Default -> {
-            DefaultAppBar(scaffoldState, scope, title, navController)
+            DefaultAppBar(title, navController)
         }
         AppBarVM.Type.Search -> {
-            DefaultAppBar(scaffoldState, scope, title, navController) {
+            DefaultAppBar(title, navController) {
                 val isExpanded = localAppBarVm.isSearchBarOpened.collectAsState()
                 val text = localAppBarVm.searchTextState.collectAsState()
                 if (isExpanded.value) {
@@ -79,10 +76,9 @@ fun AppropriateAppBar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DefaultAppBar(
-    scaffoldState: ScaffoldState,
-    scope: CoroutineScope,
     title: String,
     navController: NavController,
     content: @Composable RowScope.() -> Unit = {}
@@ -114,6 +110,7 @@ fun DefaultAppBar(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     text: String,
@@ -133,9 +130,6 @@ fun SearchBar(
                 color = Color.White
             )
         },
-        textStyle = TextStyle(
-            fontSize = MaterialTheme.typography.subtitle1.fontSize
-        ),
         singleLine = true,
         leadingIcon = {
             Icon(
@@ -169,8 +163,5 @@ fun SearchBar(
                 onSearchClicked(text)
             }
         ),
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Transparent,
-            cursorColor = Color.White.copy(alpha = ContentAlpha.medium)
-        ))
+    )
 }

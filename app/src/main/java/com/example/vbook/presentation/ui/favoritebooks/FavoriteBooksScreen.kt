@@ -5,16 +5,16 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -85,7 +85,7 @@ fun FavoriteBooksBody(
     onItemClick: (String) -> Unit
 ) {
     StateSection(state = booksState) { books ->
-        LazyVerticalGrid(cells = GridCells.Fixed(2)) {
+        LazyVerticalGrid(columns = GridCells.Fixed(2)) {
             items(books) { book ->
                 BookCard(
                     modifier = Modifier
@@ -139,14 +139,14 @@ fun BookCard(
                 Icon(imageVector = Icons.Filled.Person, contentDescription = null)
                 Text(
                     text = book.author.first,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
             Row {
                 Icon(imageVector = Icons.Filled.Mic, contentDescription = null)
                 Text(
                     text = book.reader.first,
-                    style = MaterialTheme.typography.body2
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
