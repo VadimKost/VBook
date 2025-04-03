@@ -4,77 +4,72 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.vbook.presentation.LocalAppBarVM
-import com.example.vbook.presentation.LocalNavController
-import com.example.vbook.presentation.VBookScreen
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+//import com.example.vbook.presentation.LocalAppBarVM
+//import com.example.vbook.presentation.LocalNavController
+import com.example.vbook.presentation.ui.navigation.VBookScreen
 
 
-@Composable
-fun VBookTopAppBar() {
-    val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
-    val screens = VBookScreen.values()
-    val navBackStackEntry = navController.currentBackStackEntryAsState()
-    val route = navBackStackEntry.value?.destination?.route ?: "@"
-    val currentScreenTitle =
-        screens.asSequence().firstOrNull { route.startsWith(it.name) }?.title ?: ""
-    AppropriateAppBar(
-        currentScreenTitle,
-        navController
-    )
-}
+//@Composable
+//fun VBookTopAppBar() {
+//    val navController = LocalNavController.current
+//    val scope = rememberCoroutineScope()
+//    val screens = VBookScreen.values()
+//    val navBackStackEntry = navController.currentBackStackEntryAsState()
+//    val route = navBackStackEntry.value?.destination?.route ?: "@"
+//    val currentScreenTitle =
+//        screens.asSequence().firstOrNull { route.startsWith(it.name) }?.title ?: ""
+//    AppropriateAppBar(
+//        currentScreenTitle,
+//        navController
+//    )
+//}
 
-@Composable
-fun AppropriateAppBar(
-    title: String,
-    navController: NavController
-) {
-    val localAppBarVm = LocalAppBarVM.current
-    val appBarType = localAppBarVm.currentType.collectAsState()
-    when (appBarType.value) {
-        AppBarVM.Type.Default -> {
-            DefaultAppBar(title, navController)
-        }
-        AppBarVM.Type.Search -> {
-            DefaultAppBar(title, navController) {
-                val isExpanded = localAppBarVm.isSearchBarOpened.collectAsState()
-                val text = localAppBarVm.searchTextState.collectAsState()
-                if (isExpanded.value) {
-                    SearchBar(
-                        text = text.value,
-                        onTextChange = { localAppBarVm.updateSearchBarText(it) },
-                        onCloseClicked = localAppBarVm.onClose,
-                        onSearchClicked = localAppBarVm.onSearch
-                    )
-                } else {
-                    IconButton(onClick = { localAppBarVm.isSearchBarOpened.value = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search Icon",
-                            tint = Color.White,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun AppropriateAppBar(
+//    title: String,
+//    navController: NavController
+//) {
+//    val localAppBarVm = LocalAppBarVM.current
+//    val appBarType = localAppBarVm.currentType.collectAsState()
+//    when (appBarType.value) {
+//        AppBarVM.Type.Default -> {
+//            DefaultAppBar(title, navController)
+//        }
+//        AppBarVM.Type.Search -> {
+//            DefaultAppBar(title, navController) {
+//                val isExpanded = localAppBarVm.isSearchBarOpened.collectAsState()
+//                val text = localAppBarVm.searchTextState.collectAsState()
+//                if (isExpanded.value) {
+//                    SearchBar(
+//                        text = text.value,
+//                        onTextChange = { localAppBarVm.updateSearchBarText(it) },
+//                        onCloseClicked = localAppBarVm.onClose,
+//                        onSearchClicked = localAppBarVm.onSearch
+//                    )
+//                } else {
+//                    IconButton(onClick = { localAppBarVm.isSearchBarOpened.value = true }) {
+//                        Icon(
+//                            imageVector = Icons.Default.Search,
+//                            contentDescription = "Search Icon",
+//                            tint = Color.White,
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

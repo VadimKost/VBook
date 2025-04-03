@@ -7,15 +7,9 @@
 
 package com.example.vbook.domain.usecase.mediaplayer
 
-import com.example.vbook.domain.bookplayer.BookPlayer
-import com.example.vbook.domain.model.Book
-import com.example.vbook.domain.repository.DownloadingItemRepository
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class GetPlayerStateUseCase @Inject constructor(
-    val player: BookPlayer
-) {
-    operator fun invoke() = player.getPlayerState()
-}
+//@Singleton
+//class GetPlayerStateUseCase @Inject constructor(
+//    val player: AudioBookPlayerService
+//) {
+//    operator fun invoke() = player.getPlayerState()
+//}

@@ -7,14 +7,10 @@
 
 package com.example.vbook.domain.usecase.downloadingitem
 
-import com.example.vbook.domain.repository.DownloadingItemRepository
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class GetMediaItemDownloadByDownloadIdUseCase @Inject constructor(
-    val downloadingItemRepository: DownloadingItemRepository,
-) {
-    suspend operator fun invoke(downloadId:Long) =
-        downloadingItemRepository.getMediaItemDownloadByDownloadId(downloadId)
-}
+//@Singleton
+//class GetMediaItemDownloadByDownloadIdUseCase @Inject constructor(
+//    val downloadingItemRepository: DownloadRepository,
+//) {
+//    suspend operator fun invoke(downloadId:Long) =
+//        downloadingItemRepository.getMediaItemDownloadByDownloadId(downloadId)
+//}

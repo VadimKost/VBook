@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by vadim on 03.04.25, 17:45
+  ~ Copyright (c) 2025 . All rights reserved.
+  ~ Last modified 03.04.25, 17:45
+  ~
+  -->
+
+<resources>
+    <string name="app_name">VBook</string>
+    <string name="channel_name">Медіа</string>
+    <string name="favorite">Улюблене</string>
+    <string name="new_label">Нове</string>
+</resources>

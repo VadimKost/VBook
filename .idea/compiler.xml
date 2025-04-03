@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="1.8">
-      <module name="VBook.app" target="17" />
-      <module name="VBook.data" target="17" />
-      <module name="VBook.device" target="17" />
+    <bytecodeTargetLevel target="17">
+      <module name="VBook.app" target="21" />
+      <module name="VBook.data" target="21" />
+      <module name="VBook.device" target="21" />
+      <module name="VBook.domain" target="21" />
+      <module name="VBook.domain.main" target="21" />
+      <module name="VBook.domain.test" target="21" />
       <module name="VBook.presentation" target="11" />
     </bytecodeTargetLevel>
   </component>

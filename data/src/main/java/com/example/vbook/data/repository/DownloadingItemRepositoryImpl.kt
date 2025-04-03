@@ -3,11 +3,12 @@
  * Copyright (c) 2022 . All rights reserved.
  * Last modified 09.07.22, 20:35
  *
- */
+ *//*
+
 
 package com.example.vbook.data.repository
 
-import com.example.vbook.domain.repository.DownloadingItemRepository
+import com.example.vbook.domain.downloader.port.DownloadRepository
 import com.example.vbook.data.db.AppDatabase
 import com.example.vbook.domain.ResourceState
 import com.example.vbook.domain.model.DownloadingItem
@@ -19,9 +20,9 @@ import javax.inject.Singleton
 @Singleton
 class DownloadingItemRepositoryImpl @Inject constructor(
     val db: AppDatabase,
-) : DownloadingItemRepository {
+) : DownloadRepository {
 
-    override suspend fun createDownloadingItem(bookUrl: String, downloadId: Long, mediaUri:String) {
+    override suspend fun addDownloadingItem(bookUrl: String, downloadId: Long, mediaUri:String) {
         val download = DownloadingItem(downloadId,mediaUri,bookUrl)
         return db.mediaItemDownloadDAO().insert(download.toData())
     }
@@ -51,4 +52,4 @@ class DownloadingItemRepositoryImpl @Inject constructor(
     }
 
 
-}
+}*/

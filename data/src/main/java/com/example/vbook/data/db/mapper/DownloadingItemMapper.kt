@@ -5,17 +5,3 @@
  *
  */
 
-import com.example.vbook.domain.model.DownloadingItem
-import com.example.vbook.data.db.model.DownloadingItemEntity
-
-fun DownloadingItem.toData() = DownloadingItemEntity(
-    downloadId, onlineUri, bookUrl
-)
-
-fun List<DownloadingItem>.toData() = this.map { it.toData() }
-
-fun DownloadingItemEntity.toDomain() = DownloadingItem(
-    downloadId, onlineUri, bookUrl
-)
-
-fun List<DownloadingItemEntity>.toDomain() = this.map { it.toDomain() }

@@ -1,17 +1,23 @@
 package com.example.vbook.data.parsers
 
-import com.example.vbook.domain.model.Book
+import com.example.vbook.domain.book.model.Book
+import com.example.vbook.domain.book.model.Voiceover
+
 
 abstract class BooksParser {
-    abstract val base_url: String
-    abstract val TAG: String
+    abstract val source: Source
 
-    abstract fun getAllNewBooks(page:Int):List<Book>
+    abstract suspend fun getNewBooks(page: Int): Map<String, Book>
 
-    abstract fun getFilledBook(book: Book): Book
+    abstract suspend fun getBookDetails(internalId: String): List<Voiceover>
 
-    abstract fun search(text:String,page: Int):List<Book>
+    abstract suspend fun getBooksInCycle(internalId: String): Map<String, Book>
+//
+//    abstract suspend fun getBookByAuthorAndTitle(author: String, title: String): Book?
+//
+//    abstract suspend fun search(text: String, page: Int): List<Book>
+}
 
-    abstract fun parseBookList(URL: String): MutableList<Book>
-
+enum class Source(val baseUrl: String) {
+    KnigaVUhe("https://knigavuhe.org")
 }

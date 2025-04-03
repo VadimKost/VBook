@@ -1,10 +1,5 @@
 package com.example.vbook
 
-import com.example.vbook.domain.model.Book
-
-fun Book.isDetailed(): Boolean {
-    return mediaItems != null
-}
 
 fun Long.toTime(): String {
     val minutes = this / 1000 / 60

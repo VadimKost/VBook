@@ -7,10 +7,8 @@
 
 package com.example.vbook.data.di
 
-import com.example.vbook.domain.repository.BookRepository
 import com.example.vbook.data.repository.BookRepositoryImpl
-import com.example.vbook.domain.repository.DownloadingItemRepository
-import com.example.vbook.data.repository.DownloadingItemRepositoryImpl
+import com.example.vbook.domain.book.port.BookRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +23,7 @@ class RepositoryModule {
     @Singleton
     fun provideBookRepository(impl: BookRepositoryImpl): BookRepository = impl
 
-    @Provides
-    @Singleton
-    fun provideMediaUriRepository(impl: DownloadingItemRepositoryImpl): DownloadingItemRepository = impl
+//    @Provides
+//    @Singleton
+//    fun provideMediaUriRepository(impl: DownloadingItemRepositoryImpl): DownloadRepository = impl
 }

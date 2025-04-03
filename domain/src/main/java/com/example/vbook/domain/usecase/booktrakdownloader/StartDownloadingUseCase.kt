@@ -7,14 +7,14 @@
 
 package com.example.vbook.domain.usecase.booktrakdownloader
 
-import com.example.vbook.domain.booktreackdownloader.BookTrackDownloader
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class StartDownloadingUseCase @Inject constructor(
-    val bookTrackDownloader: BookTrackDownloader
-) {
-    operator fun invoke(uri: String, downloadingTitle: String) =
-        bookTrackDownloader.startDownloading(uri, downloadingTitle)
-}
+//import com.example.vbook.domain.service.BookTrackDownloader
+//import javax.inject.Inject
+//import javax.inject.Singleton
+//
+//@Singleton
+//class StartDownloadingUseCase @Inject constructor(
+//    val bookTrackDownloader: BookTrackDownloader
+//) {
+//    operator fun invoke(uri: String, downloadingTitle: String) =
+//        bookTrackDownloader.startDownloading(uri, downloadingTitle)
+//}

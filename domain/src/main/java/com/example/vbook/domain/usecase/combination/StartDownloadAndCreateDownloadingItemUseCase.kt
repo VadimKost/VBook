@@ -7,19 +7,19 @@
 
 package com.example.vbook.domain.usecase.combination
 
-import com.example.vbook.domain.model.Book
-import com.example.vbook.domain.usecase.booktrakdownloader.StartDownloadingUseCase
-import com.example.vbook.domain.usecase.downloadingitem.CreateDownloadingItemUseCase
-import javax.inject.Inject
-import javax.inject.Singleton
+//import com.example.vbook.domain.model.Book
+//import com.example.vbook.domain.usecase.booktrakdownloader.StartDownloadingUseCase
+//import com.example.vbook.domain.usecase.downloadingitem.CreateDownloadingItemUseCase
+//import javax.inject.Inject
+//import javax.inject.Singleton
 
-@Singleton
-class StartDownloadAndCreateDownloadingItemUseCase @Inject constructor(
-    val startDownloadingUseCase: StartDownloadingUseCase,
-    val createDownloadingItemUseCase: CreateDownloadingItemUseCase
-) {
-    suspend operator fun invoke(uri: String, book: Book) {
-        val downloadId = startDownloadingUseCase(uri, book.title)
-        createDownloadingItemUseCase(uri, downloadId, book)
-    }
-}
+//@Singleton
+//class StartDownloadAndCreateDownloadingItemUseCase @Inject constructor(
+//    val startDownloadingUseCase: StartDownloadingUseCase,
+//    val createDownloadingItemUseCase: CreateDownloadingItemUseCase
+//) {
+//    suspend operator fun invoke(uri: String, book: Book) {
+//        val downloadId = startDownloadingUseCase(uri, book.title)
+//        createDownloadingItemUseCase(uri, downloadId, book)
+//    }
+//}
